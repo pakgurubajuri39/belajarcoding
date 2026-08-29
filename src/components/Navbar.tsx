@@ -1,0 +1,231 @@
+import React from 'react';
+import { Sun, Moon, Sparkles, Trophy, BookOpen, BarChart3, Bot, KeyRound, Award, Shield, Laptop, LogOut, Settings, Bell } from 'lucide-react';
+import { UserRole, UserSession, StudentProgress } from '../types';
+import { BrandLogo } from './BrandLogo';
+import { getRankFromXp } from '../utils/storage';
+import { AVATAR_OPTIONS } from '../data/syllabus';
+
+interface NavbarProps {
+  currentTab: 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin';
+  setCurrentTab: (tab: 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin') => void;
+  session: UserSession;
+  progress: StudentProgress;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
+  onOpenLoginModal: () => void;
+  onLogout: () => void;
+  unreadNotificationsCount?: number;
+  onOpenNotifications: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({
+  currentTab,
+  setCurrentTab,
+  session,
+  progress,
+  theme,
+  onToggleTheme,
+  onOpenLoginModal,
+  onLogout,
+  unreadNotificationsCount = 0,
+  onOpenNotifications
+}) => {
+  const rankInfo = getRankFromXp(progress.xp);
+  const avatarObj = AVATAR_OPTIONS.find(a => a.id === session.avatar) || AVATAR_OPTIONS[0];
+
+  return (
+    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/90 dark:bg-slate-950/90 border-b border-slate-200 dark:border-slate-800/80 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-18 gap-2 sm:gap-4">
+          
+          {/* Left: Brand Logo & Role Pill */}
+          <div className="flex items-center gap-3 cursor-pointer flex-shrink-0" onClick={() => setCurrentTab('syllabus')}>
+            <BrandLogo size="md" />
+          </div>
+
+          {/* Center: Main Navigation Tabs - Bento Style */}
+          <nav className="hidden md:flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/70 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <button
+              onClick={() => setCurrentTab('syllabus')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                currentTab === 'syllabus'
+                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Silabus 20 Level</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('scratch')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                currentTab === 'scratch'
+                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Laptop className="w-3.5 h-3.5" />
+              <span>Scratch Studio</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('progress')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                currentTab === 'progress'
+                  ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>Grafik Progres</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('certificate')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                currentTab === 'certificate'
+                  ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Award className="w-3.5 h-3.5" />
+              <span>Sertifikat</span>
+            </button>
+
+            {session.role === 'admin' && (
+              <button
+                onClick={() => setCurrentTab('admin')}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                  currentTab === 'admin'
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-indigo-400 hover:text-indigo-300'
+                }`}
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span>Admin</span>
+              </button>
+            )}
+          </nav>
+
+          {/* Right Bento Status & XP Group */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            
+            {/* Status Pill */}
+            <div className="hidden lg:flex items-center gap-2 bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full">
+              <div className={`w-2 h-2 rounded-full ${session.role === 'guest' ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400 animate-pulse'}`} />
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                {session.role === 'admin' ? 'Admin Active' : session.role === 'student' ? 'Siswa Aktif' : 'Trial Level Active'}
+              </span>
+            </div>
+
+            {/* XP Pill Bento Container */}
+            <div 
+              onClick={() => setCurrentTab('progress')}
+              className="cursor-pointer flex items-center gap-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 pr-3 rounded-full hover:border-indigo-500/50 transition-all"
+              title={`${progress.xp} XP - Pangkat: ${rankInfo.title}`}
+            >
+              <div className="bg-amber-400 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">
+                XP {progress.xp.toLocaleString()}
+              </div>
+              <span className="text-xs font-semibold text-slate-800 dark:text-white hidden sm:inline">
+                Level {rankInfo.level}
+              </span>
+            </div>
+
+            {/* Notification Bell Button */}
+            <button
+              onClick={onOpenNotifications}
+              aria-label="Lihat Notifikasi"
+              className="relative p-2 bg-slate-100 dark:bg-slate-900 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-all text-slate-700 dark:text-slate-300"
+              title="Notifikasi & Pengingat Sesi Coding"
+            >
+              <Bell className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black flex items-center justify-center shadow-md animate-pulse">
+                  {unreadNotificationsCount}
+                </span>
+              )}
+            </button>
+
+            {/* Quick Action Button - Theme Toggle */}
+            <button
+              onClick={onToggleTheme}
+              aria-label="Toggle Dark/Light Mode"
+              className="p-2 bg-slate-100 dark:bg-slate-900 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-all text-slate-700 dark:text-slate-300"
+              title={theme === 'dark' ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-indigo-600" />
+              )}
+            </button>
+
+            {/* Profile Menu Trigger Button */}
+            <button
+              onClick={onOpenLoginModal}
+              className="p-2 bg-slate-100 dark:bg-slate-900 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-all text-slate-700 dark:text-slate-300 flex items-center gap-1.5"
+              title="Akses & Akun Siswa"
+            >
+              <span className="text-sm">{avatarObj.emoji}</span>
+              <KeyRound className="w-3.5 h-3.5 text-slate-400" />
+            </button>
+
+          </div>
+        </div>
+
+        {/* Mobile Navigation bar */}
+        <div className="flex md:hidden items-center justify-around py-2 border-t border-slate-200 dark:border-slate-800/80 overflow-x-auto gap-1 text-[11px]">
+          <button
+            onClick={() => setCurrentTab('syllabus')}
+            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
+              currentTab === 'syllabus' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Silabus</span>
+          </button>
+          <button
+            onClick={() => setCurrentTab('scratch')}
+            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
+              currentTab === 'scratch' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            <Laptop className="w-3.5 h-3.5" />
+            <span>Scratch</span>
+          </button>
+          <button
+            onClick={() => setCurrentTab('progress')}
+            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
+              currentTab === 'progress' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Grafik</span>
+          </button>
+          <button
+            onClick={() => setCurrentTab('certificate')}
+            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
+              currentTab === 'certificate' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5" />
+            <span>Sertifikat</span>
+          </button>
+          {session.role === 'admin' && (
+            <button
+              onClick={() => setCurrentTab('admin')}
+              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
+                currentTab === 'admin' ? 'bg-indigo-600 text-white font-bold' : 'text-indigo-400'
+              }`}
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>Admin</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
