@@ -115,7 +115,7 @@ export const CertificateView: React.FC<CertificateViewProps> = ({
           <div className="w-full max-w-2xl flex items-end justify-between pt-6 border-t border-white/10 text-xs">
             {/* Left: Instructor */}
             <div className="flex flex-col items-center space-y-1">
-              <span className="font-serif italic text-base text-amber-300">Pak Guru AI & Bajuri</span>
+              <span className="font-serif italic text-base text-amber-300">Pak GuruAI</span>
               <div className="w-36 h-0.5 bg-slate-600" />
               <span className="text-[11px] font-bold text-slate-300">Instruktur Utama Coding & AI</span>
               <span className="text-[9px] text-slate-500">DJuragan Coding Academy</span>
