@@ -626,6 +626,7 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         onLoadFromComputer={() => alert('Fitur unggah file .sb3 siap!')}
         onOpenTutorials={() => window.open('https://scratch.mit.edu/ideas', '_blank')}
         onShareProject={() => alert('Proyek berhasil dibagikan!')}
+        isCompact={isCompact || stageLayout === 'small'}
       />
 
       {/* 2. SUB-HEADER: TABS & GREEN FLAG STAGE CONTROLS */}
@@ -639,6 +640,7 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         setStageLayout={setStageLayout}
         isMaximized={isMaximized}
         setIsMaximized={setIsMaximized}
+        isCompact={isCompact || stageLayout === 'small'}
       />
 
       {/* 3. MAIN EDITOR BODY */}
@@ -646,7 +648,7 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         
         {/* TAB: CODE (Kode) */}
         {activeTab === 'code' && (
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex overflow-hidden min-w-0">
             {/* Left Category Rail + Blocks Palette */}
             <ScratchBlocksPalette
               activeCategory={activeCategory}
@@ -654,6 +656,7 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
               onAddBlock={handleAddBlockToScript}
               onDragStartFromPalette={handleDragStartFromPalette}
               onOpenExtensionsModal={() => setIsExtensionsModalOpen(true)}
+              isCompact={isCompact || stageLayout === 'small'}
             />
 
             {/* Middle Scripts Workspace */}
@@ -689,9 +692,13 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         )}
 
         {/* RIGHT PANE: STAGE & SPRITE MANAGEMENT */}
-        <div className="w-[360px] sm:w-[420px] flex-shrink-0 flex flex-col bg-[#F2F7FE] border-l border-[#D0E2FB] overflow-y-auto custom-scrollbar">
+        <div className={`flex-shrink-0 flex flex-col bg-[#F2F7FE] border-l border-[#D0E2FB] overflow-y-auto custom-scrollbar transition-all duration-200 ${
+          isCompact || stageLayout === 'small'
+            ? 'w-[260px] sm:w-[300px]'
+            : 'w-[320px] sm:w-[400px]'
+        }`}>
           {/* Top Stage */}
-          <div className="p-3 bg-[#E9F1FC] border-b border-[#D0E2FB] flex items-center justify-center">
+          <div className="p-2 bg-[#E9F1FC] border-b border-[#D0E2FB] flex items-center justify-center">
             <ScratchStage
               sprites={sprites}
               selectedSpriteId={selectedSpriteId}
@@ -702,6 +709,7 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
               selectedBackdrop={selectedBackdrop}
               stageVariables={stageVariables}
               penTrailsRef={penTrailsRef}
+              isCompact={isCompact || stageLayout === 'small'}
             />
           </div>
 
@@ -715,6 +723,7 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
             onRemoveSprite={handleRemoveSprite}
             selectedBackdrop={selectedBackdrop}
             onSelectBackdrop={setSelectedBackdrop}
+            isCompact={isCompact || stageLayout === 'small'}
           />
         </div>
 

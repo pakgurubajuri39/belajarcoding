@@ -9,6 +9,7 @@ interface ScratchStageProps {
   selectedBackdrop: string;
   stageVariables: { skor: number; nyawa: number; timer: number };
   penTrailsRef: React.MutableRefObject<{ x1: number; y1: number; x2: number; y2: number; color: string }[]>;
+  isCompact?: boolean;
 }
 
 export const ScratchStage: React.FC<ScratchStageProps> = ({
@@ -18,7 +19,8 @@ export const ScratchStage: React.FC<ScratchStageProps> = ({
   onUpdateSpritePos,
   selectedBackdrop,
   stageVariables,
-  penTrailsRef
+  penTrailsRef,
+  isCompact = false
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDraggingSprite, setIsDraggingSprite] = useState(false);
@@ -376,7 +378,9 @@ export const ScratchStage: React.FC<ScratchStageProps> = ({
   };
 
   return (
-    <div className="relative w-full aspect-[4/3] max-w-[480px] mx-auto bg-white rounded-lg overflow-hidden border border-slate-300 shadow-inner flex items-center justify-center select-none">
+    <div className={`relative w-full aspect-[4/3] mx-auto bg-white rounded-lg overflow-hidden border border-slate-300 shadow-inner flex items-center justify-center select-none ${
+      isCompact ? 'max-w-[340px]' : 'max-w-[480px]'
+    }`}>
       
       {/* 480x360 Native Scratch Stage Canvas */}
       <canvas
@@ -387,32 +391,34 @@ export const ScratchStage: React.FC<ScratchStageProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        className="w-full h-full cursor-pointer"
+        className="w-full h-full cursor-pointer object-contain"
         title="Klik dan seret sprite langsung di panggung"
       />
 
       {/* Top Left Scratch Variable Monitors */}
-      <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
+      <div className={`absolute top-1.5 left-1.5 flex flex-col gap-1 z-10 pointer-events-none ${
+        isCompact ? 'scale-90 origin-top-left' : ''
+      }`}>
         {/* Skor Variable */}
-        <div className="bg-[#E9F1FC] border border-[#B8D5FA] rounded-md px-2 py-0.5 shadow-sm flex items-center gap-1.5 text-[11px] font-bold">
+        <div className="bg-[#E9F1FC] border border-[#B8D5FA] rounded-md px-1.5 py-0.5 shadow-sm flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold">
           <span className="text-[#FF8C1A]">skor</span>
-          <span className="bg-[#FF8C1A] text-white px-1.5 py-0.2 rounded text-[11px] font-black">
+          <span className="bg-[#FF8C1A] text-white px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-black">
             {stageVariables.skor}
           </span>
         </div>
 
         {/* Nyawa Variable */}
-        <div className="bg-[#E9F1FC] border border-[#B8D5FA] rounded-md px-2 py-0.5 shadow-sm flex items-center gap-1.5 text-[11px] font-bold">
+        <div className="bg-[#E9F1FC] border border-[#B8D5FA] rounded-md px-1.5 py-0.5 shadow-sm flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold">
           <span className="text-[#FF8C1A]">nyawa</span>
-          <span className="bg-[#FF8C1A] text-white px-1.5 py-0.2 rounded text-[11px] font-black">
+          <span className="bg-[#FF8C1A] text-white px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-black">
             {stageVariables.nyawa}
           </span>
         </div>
 
         {/* Timer Variable */}
-        <div className="bg-[#E9F1FC] border border-[#B8D5FA] rounded-md px-2 py-0.5 shadow-sm flex items-center gap-1.5 text-[11px] font-bold">
+        <div className="bg-[#E9F1FC] border border-[#B8D5FA] rounded-md px-1.5 py-0.5 shadow-sm flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold">
           <span className="text-[#5CB1D6]">timer</span>
-          <span className="bg-[#5CB1D6] text-white px-1.5 py-0.2 rounded text-[11px] font-black">
+          <span className="bg-[#5CB1D6] text-white px-1.5 py-0.2 rounded text-[10px] sm:text-[11px] font-black">
             {stageVariables.timer.toFixed(1)}
           </span>
         </div>

@@ -695,6 +695,7 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
             <ScratchEmbed
               currentLevelTitle={`Level ${level.id}: ${level.title}`}
               tutorialUrl={level.scratchTutorialUrl || 'https://scratch.mit.edu/projects/editor/?tutorial=getStarted'}
+              isCompact={true}
             />
           </div>
         </div>

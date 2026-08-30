@@ -15,6 +15,7 @@ interface ScratchHeaderProps {
   onOpenTutorials?: () => void;
   onShareProject?: () => void;
   studentName?: string;
+  isCompact?: boolean;
 }
 
 export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
@@ -27,7 +28,8 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
   onNewProject,
   onOpenTutorials,
   onShareProject,
-  studentName = 'DJuragan Siswa'
+  studentName = 'DJuragan Siswa',
+  isCompact = false
 }) => {
   const [activeMenu, setActiveMenu] = useState<'file' | 'edit' | 'lang' | 'profile' | null>(null);
   const [isShared, setIsShared] = useState(false);
@@ -47,36 +49,36 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
   return (
     <header
       id="scratch-main-header"
-      className="bg-[#4C97FF] text-white px-2.5 sm:px-3.5 py-1.5 flex flex-wrap items-center justify-between gap-2 select-none z-30 shadow-md relative"
+      className="bg-[#4C97FF] text-white px-2 sm:px-3 py-1 sm:py-1.5 flex items-center justify-between gap-1.5 select-none z-30 shadow-md relative overflow-x-auto custom-scrollbar flex-nowrap"
     >
       {/* LEFT SECTION: Scratch Logo + Dropdown Menus + Tutorials */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
         
         {/* Authentic Scratch 3.0 Logo */}
         <a
           href="https://scratch.mit.edu"
           target="_blank"
           rel="noreferrer"
-          className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-black/10 transition-colors mr-1"
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-black/10 transition-colors mr-0.5"
           title="Scratch MIT 3.0"
         >
-          <div className="bg-[#FFAB19] text-white font-black text-xs px-1.5 py-0.5 rounded shadow-sm flex items-center justify-center font-sans tracking-tight">
+          <div className="bg-[#FFAB19] text-white font-black text-[11px] sm:text-xs px-1.5 py-0.5 rounded shadow-sm flex items-center justify-center font-sans tracking-tight">
             scratch
           </div>
-          <span className="hidden xl:inline text-[11px] font-bold text-white/90">DJuragan Edition</span>
+          {!isCompact && <span className="hidden xl:inline text-[11px] font-bold text-white/90">DJuragan</span>}
         </a>
 
         {/* Globe Language Selector */}
         <div className="relative">
           <button
             onClick={() => handleToggleMenu('lang')}
-            className={`p-1.5 rounded hover:bg-black/15 transition-colors flex items-center gap-1 ${
+            className={`p-1 rounded hover:bg-black/15 transition-colors flex items-center gap-0.5 ${
               activeMenu === 'lang' ? 'bg-black/20' : ''
             }`}
             title="Pilih Bahasa"
           >
-            <Globe className="w-4 h-4" />
-            <ChevronDown className="w-3 h-3 opacity-80" />
+            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 opacity-80" />
           </button>
 
           {activeMenu === 'lang' && (
@@ -105,12 +107,12 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => handleToggleMenu('file')}
-            className={`px-2.5 py-1 rounded text-xs font-bold hover:bg-black/15 transition-colors flex items-center gap-1 ${
+            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-bold hover:bg-black/15 transition-colors flex items-center gap-0.5 ${
               activeMenu === 'file' ? 'bg-black/20' : ''
             }`}
           >
             <span>Berkas</span>
-            <ChevronDown className="w-3 h-3 opacity-80" />
+            <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 opacity-80" />
           </button>
 
           {activeMenu === 'file' && (
@@ -148,12 +150,12 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => handleToggleMenu('edit')}
-            className={`px-2.5 py-1 rounded text-xs font-bold hover:bg-black/15 transition-colors flex items-center gap-1 ${
+            className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-bold hover:bg-black/15 transition-colors flex items-center gap-0.5 ${
               activeMenu === 'edit' ? 'bg-black/20' : ''
             }`}
           >
             <span>Sunting</span>
-            <ChevronDown className="w-3 h-3 opacity-80" />
+            <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 opacity-80" />
           </button>
 
           {activeMenu === 'edit' && (
@@ -176,22 +178,24 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
         </div>
 
         {/* TUTORIALS BUTTON */}
-        <button
-          onClick={onOpenTutorials}
-          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold bg-black/10 hover:bg-black/20 transition-colors"
-          title="Buka Koleksi Tutorial Scratch"
-        >
-          <Lightbulb className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-          <span>Tutorial</span>
-        </button>
+        {!isCompact && (
+          <button
+            onClick={onOpenTutorials}
+            className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-bold bg-black/10 hover:bg-black/20 transition-colors"
+            title="Buka Koleksi Tutorial Scratch"
+          >
+            <Lightbulb className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+            <span>Tutorial</span>
+          </button>
+        )}
 
         {/* PROJECT TITLE INPUT */}
-        <div className="flex items-center bg-[#3373CC] px-2.5 py-1 rounded-md border border-white/20 ml-1">
+        <div className="flex items-center bg-[#3373CC] px-2 py-0.5 rounded-md border border-white/20 ml-0.5">
           <input
             type="text"
             value={projectTitle}
             onChange={(e) => setProjectTitle(e.target.value)}
-            className="bg-transparent text-white font-bold text-xs focus:outline-none w-32 sm:w-44 md:w-56 placeholder-white/60 truncate"
+            className="bg-transparent text-white font-bold text-[11px] sm:text-xs focus:outline-none w-24 sm:w-36 md:w-48 placeholder-white/60 truncate"
             title="Ganti Judul Proyek"
           />
         </div>
@@ -199,7 +203,7 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
         {/* ORANGE SHARE (BAGIKAN) BUTTON */}
         <button
           onClick={handleShareClick}
-          className={`px-3 py-1 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 ${
+          className={`px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold transition-all shadow-sm flex items-center gap-1 ${
             isShared
               ? 'bg-emerald-500 text-white'
               : 'bg-[#FF8C1A] hover:bg-[#E6770D] text-white active:scale-95'
@@ -210,50 +214,40 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
           <span>{isShared ? 'Tersimpan ✓' : 'Bagikan'}</span>
         </button>
 
-        {/* SEE PROJECT PAGE BUTTON */}
-        <button
-          onClick={() => window.open('https://scratch.mit.edu/projects/editor/', '_blank')}
-          className="hidden lg:flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium text-white/90 hover:text-white hover:bg-black/10 transition-colors"
-          title="Buka Editor Resmi MIT Scratch di Tab Baru"
-        >
-          <span>Halaman Proyek</span>
-          <ExternalLink className="w-3 h-3 opacity-80" />
-        </button>
-
       </div>
 
       {/* RIGHT SECTION: My Stuff Folder + User Profile */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         {/* Turbo Mode Indicator Badge */}
         {isTurboMode && (
-          <div className="hidden sm:flex items-center gap-1 bg-amber-400 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded shadow-sm">
-            <Zap className="w-3 h-3 fill-current" />
-            <span>TURBO MODE</span>
+          <div className="hidden lg:flex items-center gap-1 bg-amber-400 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded shadow-sm">
+            <Zap className="w-2.5 h-2.5 fill-current" />
+            <span>TURBO</span>
           </div>
         )}
 
         {/* My Stuff (Karyaku) */}
         <button
           onClick={closeMenu}
-          className="p-1.5 rounded hover:bg-black/15 transition-colors text-white"
+          className="p-1 sm:p-1.5 rounded hover:bg-black/15 transition-colors text-white"
           title="Karyaku (Proyek Tersimpan)"
         >
-          <FolderOpen className="w-4 h-4" />
+          <FolderOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         {/* Profile Avatar & Username */}
         <div className="relative">
           <button
             onClick={() => handleToggleMenu('profile')}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded hover:bg-black/15 transition-colors text-xs font-bold ${
+            className={`flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-black/15 transition-colors text-xs font-bold ${
               activeMenu === 'profile' ? 'bg-black/20' : ''
             }`}
           >
-            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-white text-[10px] font-bold">
+            <div className="w-4.5 h-4.5 rounded-full bg-white/20 flex items-center justify-center text-white text-[10px] font-bold">
               🐱
             </div>
-            <span className="hidden md:inline max-w-[100px] truncate">{studentName}</span>
-            <ChevronDown className="w-3 h-3 opacity-80" />
+            <span className="hidden xl:inline max-w-[80px] truncate">{studentName}</span>
+            <ChevronDown className="w-2.5 h-2.5 opacity-80" />
           </button>
 
           {activeMenu === 'profile' && (
