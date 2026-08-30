@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  AreaChart, Area, PieChart, Pie, Cell, LineChart, Line
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from 'recharts';
-import { Trophy, Award, Flame, CheckCircle2, Lock, Sparkles, BookOpen, Star, ArrowUpRight, Zap, Target, HardDrive, Clock, Activity, Calendar, ShieldCheck, Check } from 'lucide-react';
+import {
+  Trophy, Award, Flame, CheckCircle2, Lock, Sparkles, BookOpen, Star,
+  ArrowUpRight, Zap, Target, HardDrive, Clock, Activity, Calendar,
+  ShieldCheck, Check, Download, FileText, Loader2, Share2
+} from 'lucide-react';
 import { StudentProgress, UserSession } from '../types';
 import { SYLLABUS_DATA, BADGES_DATA, AVATAR_OPTIONS } from '../data/syllabus';
 import { getRankFromXp } from '../utils/storage';
+import { generateStudentProgressPDF } from '../utils/pdfReport';
 
 interface ProgressDashboardProps {
   progress: StudentProgress;
@@ -20,6 +24,9 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
   session,
   onSelectLevel
 }) => {
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
+
   const rankInfo = getRankFromXp(progress.xp);
   const avatarObj = AVATAR_OPTIONS.find(a => a.id === session.avatar) || AVATAR_OPTIONS[0];
 
@@ -72,9 +79,68 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
 
   const COLORS = ['#6366f1', '#3b82f6', '#06b6d4', '#f59e0b', '#ec4899', '#10b981', '#8b5cf6', '#14b8a6'];
 
+  const handleDownloadReport = () => {
+    setIsDownloadingPdf(true);
+    try {
+      generateStudentProgressPDF(progress, session);
+      setDownloadSuccess(true);
+      setTimeout(() => setDownloadSuccess(false), 4000);
+    } catch (err) {
+      console.error('Failed to generate PDF:', err);
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  };
+
   return (
     <div className="space-y-6 pb-12">
       
+      {/* Top Banner Action Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 rounded-3xl shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+              Laporan Evaluasi & Progres Belajar Siswa
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Unduh lembar dokumen resmi berformat PDF berisi rekapitulasi XP, 20 level silabus, dan trofi lencana.
+            </p>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <button
+          onClick={handleDownloadReport}
+          disabled={isDownloadingPdf}
+          className={`w-full sm:w-auto px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all transform active:scale-95 flex-shrink-0 ${
+            downloadSuccess
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+              : 'bg-gradient-to-r from-amber-400 via-orange-500 to-indigo-600 hover:from-amber-300 hover:to-indigo-500 text-slate-950 font-black shadow-amber-500/20'
+          }`}
+          id="btn-download-progress-pdf"
+        >
+          {isDownloadingPdf ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+              <span>Membuat Dokumen PDF...</span>
+            </>
+          ) : downloadSuccess ? (
+            <>
+              <Check className="w-4 h-4 text-white" />
+              <span>Laporan Berhasil Diunduh! ✓</span>
+            </>
+          ) : (
+            <>
+              <Download className="w-4 h-4 text-slate-950" />
+              <span>Unduh Laporan Progres (PDF)</span>
+            </>
+          )}
+        </button>
+      </div>
+
       {/* Top Bento Row: Profile Hero + Real Stats Bento + Storage Status Bento */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
@@ -101,6 +167,16 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* PDF Quick Download Icon Button */}
+              <button
+                onClick={handleDownloadReport}
+                title="Cetak/Unduh Laporan PDF"
+                className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-amber-300 border border-white/10 transition-all flex items-center gap-1.5 text-xs font-bold"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">PDF</span>
+              </button>
             </div>
 
             {/* Quick Metrics Bento 3-column with REAL Data */}

@@ -6,8 +6,8 @@ import { getRankFromXp } from '../utils/storage';
 import { AVATAR_OPTIONS } from '../data/syllabus';
 
 interface NavbarProps {
-  currentTab: 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin';
-  setCurrentTab: (tab: 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin') => void;
+  currentTab: 'about' | 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin';
+  setCurrentTab: (tab: 'about' | 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin') => void;
   session: UserSession;
   progress: StudentProgress;
   theme: 'dark' | 'light';
@@ -38,13 +38,29 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18 gap-2 sm:gap-4">
           
-          {/* Left: Brand Logo & Role Pill */}
-          <div className="flex items-center gap-3 cursor-pointer flex-shrink-0" onClick={() => setCurrentTab('syllabus')}>
+          {/* Left: Brand Logo */}
+          <div 
+            className="flex items-center gap-3 cursor-pointer flex-shrink-0" 
+            onClick={() => setCurrentTab(session.isAuthenticated ? 'syllabus' : 'about')}
+            title="DJuragan Coding - Beranda"
+          >
             <BrandLogo size="md" />
           </div>
 
           {/* Center: Main Navigation Tabs - Bento Style */}
           <nav className="hidden md:flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/70 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <button
+              onClick={() => setCurrentTab('about')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                currentTab === 'about'
+                  ? 'bg-amber-400 text-slate-950 shadow-sm font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Tentang DJuragan</span>
+            </button>
+
             <button
               onClick={() => setCurrentTab('syllabus')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
@@ -177,6 +193,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Mobile Navigation bar */}
         <div className="flex md:hidden items-center justify-around py-2 border-t border-slate-200 dark:border-slate-800/80 overflow-x-auto gap-1 text-[11px]">
+          <button
+            onClick={() => setCurrentTab('about')}
+            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
+              currentTab === 'about' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Tentang</span>
+          </button>
           <button
             onClick={() => setCurrentTab('syllabus')}
             className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${

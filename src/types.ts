@@ -40,6 +40,24 @@ export interface Challenge {
   tips: string[];
 }
 
+export interface BlockLine {
+  text: string;
+  category: 'Motion' | 'Looks' | 'Sound' | 'Events' | 'Control' | 'Sensing' | 'Operators' | 'Variables' | 'My Blocks' | 'Pen' | 'Custom';
+  indent?: number; // 0, 1, 2 for nested blocks
+}
+
+export interface ScriptPseudocode {
+  title: string;
+  spriteName: string;
+  codeBlocks: BlockLine[];
+  explanation: string;
+}
+
+export interface TroubleshootingTip {
+  problem: string;
+  solution: string;
+}
+
 export interface SyllabusLevel {
   id: number;
   semester: 1 | 2; // 1 = Ganjil, 2 = Genap
@@ -53,6 +71,10 @@ export interface SyllabusLevel {
   category: CategoryType;
   summary: string;
   conceptExplanation: string;
+  learningGoals?: string[];
+  scriptPseudocode?: ScriptPseudocode[];
+  troubleshootingTips?: TroubleshootingTip[];
+  summaryPoints?: string[];
   keyBlocks: KeyBlock[];
   missionSteps: MissionStep[];
   scratchTutorialUrl?: string;

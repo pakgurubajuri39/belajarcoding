@@ -7,6 +7,7 @@ import { ScratchEmbed } from './components/ScratchEmbed';
 import { CertificateView } from './components/CertificateView';
 import { AdminPanel } from './components/AdminPanel';
 import { LoginModal } from './components/LoginModal';
+import { AboutLandingView } from './components/AboutLandingView';
 import { Footer } from './components/Footer';
 import { InAppNotificationToast } from './components/InAppNotificationToast';
 import { NotificationCenterModal } from './components/NotificationCenterModal';
@@ -44,11 +45,13 @@ export default function App() {
   const [isQuickTimerOpen, setIsQuickTimerOpen] = useState(false);
 
   // Active navigation tab
-  const [currentTab, setCurrentTab] = useState<'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin'>('syllabus');
+  const [currentTab, setCurrentTab] = useState<'about' | 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin'>(
+    session.isAuthenticated ? 'syllabus' : 'about'
+  );
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null);
   
   // Login modal
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(!session.isAuthenticated);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Sync theme with document element
   useEffect(() => {
@@ -154,6 +157,9 @@ export default function App() {
   const handleLoginSuccess = (newSession: UserSession) => {
     setSession(newSession);
     setIsLoginModalOpen(false);
+    if (currentTab === 'about') {
+      setCurrentTab('syllabus');
+    }
 
     // If student or admin, unlock levels accordingly
     if (newSession.role === 'student') {
@@ -174,6 +180,26 @@ export default function App() {
     }
   };
 
+  const handleStartTrial = () => {
+    const trialSession: UserSession = {
+      isAuthenticated: true,
+      role: 'guest',
+      studentName: 'Siswa Uji Coba (Trial)',
+      avatar: 'bot_neon',
+      loginDate: new Date().toISOString()
+    };
+    setSession(trialSession);
+    if (!progress.unlockedLevelIds.includes(1)) {
+      setProgress(prev => ({
+        ...prev,
+        unlockedLevelIds: [1]
+      }));
+    }
+    setSelectedLevelId(1);
+    setCurrentTab('syllabus');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleLogout = () => {
     const defaultSess: UserSession = {
       isAuthenticated: false,
@@ -183,7 +209,8 @@ export default function App() {
       loginDate: new Date().toISOString()
     };
     setSession(defaultSess);
-    setIsLoginModalOpen(true);
+    setCurrentTab('about');
+    setSelectedLevelId(null);
   };
 
   const handleSelectLevel = (levelId: number) => {
@@ -227,6 +254,16 @@ export default function App() {
     // Check badges
     const { updatedProgress } = checkAndAwardBadges(updatedRaw);
     setProgress(updatedProgress);
+  };
+
+  const handleSaveNote = (levelId: number, note: string) => {
+    setProgress(prev => ({
+      ...prev,
+      notes: {
+        ...prev.notes,
+        [levelId]: note
+      }
+    }));
   };
 
   const handleNextLevel = () => {
@@ -287,10 +324,25 @@ export default function App() {
             onNextLevel={handleNextLevel}
             onPrevLevel={handlePrevLevel}
             onBackToSyllabus={() => setSelectedLevelId(null)}
+            onSaveNote={handleSaveNote}
           />
         ) : (
           /* Render Main Tab Views */
           <>
+            {currentTab === 'about' && (
+              <AboutLandingView
+                session={session}
+                progress={progress}
+                onOpenLoginModal={() => setIsLoginModalOpen(true)}
+                onStartTrial={handleStartTrial}
+                onSelectLevel={handleSelectLevel}
+                onNavigateTab={(tab) => {
+                  setCurrentTab(tab);
+                  setSelectedLevelId(null);
+                }}
+              />
+            )}
+
             {currentTab === 'syllabus' && (
               <SyllabusListView
                 progress={progress}
