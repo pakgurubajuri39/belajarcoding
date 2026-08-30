@@ -74,20 +74,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         loginDate: new Date().toISOString()
       });
     } else {
-      setErrorMessage('Kode akses tidak valid. Silakan periksa kembali atau gunakan tombol pintasan cepat di bawah.');
+      setErrorMessage('Kode akses tidak valid. Silakan periksa kembali atau minta kode akses kepada guru/instruktur pembina.');
     }
-  };
-
-  const handleQuickFillStudent = () => {
-    setAccessCode(STUDENT_PASSCODE);
-    if (!studentName) setStudentName('Budi Siswa Hebat');
-    setErrorMessage('');
-  };
-
-  const handleQuickFillAdmin = () => {
-    setAccessCode(ADMIN_PASSCODE);
-    if (!studentName) setStudentName('Pak Guru Bajuri');
-    setErrorMessage('');
   };
 
   const handleTrialSubmit = (e: React.FormEvent) => {
@@ -178,7 +166,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     },
     {
       q: 'Bagaimana cara memperoleh Kode Akses Siswa resmi?',
-      a: 'Kode akses diberikan oleh guru pembina kelas atau instruktur sekolah mitra. Anda juga dapat menggunakan tombol pintasan cepat di halaman ini (contoh kode siswa: "djuragan39", guru: "bajuri39") atau mencoba Modul 1 secara instan melalui tab Trial Gratis.'
+      a: 'Kode akses resmi diberikan langsung oleh guru pembina kelas atau instruktur sekolah mitra. Anda juga dapat mencoba Modul 1 secara instan tanpa kode akses melalui tab Trial Gratis.'
     },
     {
       q: 'Apakah anak perlu menginstal software khusus di komputer?',
@@ -473,27 +461,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                         className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
                       >
                         {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Fast Shortcuts */}
-                  <div className="pt-0.5 flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
-                    <span className="text-slate-400">Pintasan Kode:</span>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={handleQuickFillStudent}
-                        className="px-2 py-0.5 rounded-md bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 text-amber-300 font-mono font-bold transition-all text-[10px]"
-                      >
-                        Siswa: djuragan39
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleQuickFillAdmin}
-                        className="px-2 py-0.5 rounded-md bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 font-mono font-bold transition-all text-[10px]"
-                      >
-                        Guru: bajuri39
                       </button>
                     </div>
                   </div>
