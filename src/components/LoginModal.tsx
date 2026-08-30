@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   KeyRound, ShieldCheck, UserCheck, Sparkles, Eye, EyeOff, CheckCircle2,
   AlertCircle, ArrowRight, Lock, Laptop, Trophy, Target, Award,
-  BookOpen, Star, Flame, Check, HelpCircle, Code2, Zap, HeartHandshake, Play
+  BookOpen, Star, Flame, Check, HelpCircle, Code2, Zap, HeartHandshake, Play,
+  LogOut, X
 } from 'lucide-react';
 import { STUDENT_PASSCODE, ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
 import { UserRole, UserSession } from '../types';
@@ -15,13 +16,15 @@ interface LoginModalProps {
   onClose?: () => void;
   onLoginSuccess: (session: UserSession) => void;
   currentRole: UserRole;
+  onLogout?: () => void;
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   onClose,
   onLoginSuccess,
-  currentRole
+  currentRole,
+  onLogout
 }) => {
   const savedProgress = loadProgress();
   const savedSession = loadSession();
@@ -94,6 +97,31 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           {/* Ambient decorative lighting */}
           <div className="absolute -top-24 -right-24 w-60 h-60 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -left-24 w-60 h-60 rounded-full bg-amber-500/20 blur-3xl pointer-events-none" />
+
+          {/* Top-right actions (Close / Logout) */}
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-semibold flex items-center gap-1 transition-all"
+                title="Keluar / Logout Akun"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Keluar</span>
+              </button>
+            )}
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-white transition-all"
+                title="Tutup Jendela"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
           {/* Header & Brand */}
           <div className="flex flex-col items-center text-center mb-5 flex-shrink-0">

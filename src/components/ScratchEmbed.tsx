@@ -18,12 +18,16 @@ interface ScratchEmbedProps {
   tutorialUrl?: string;
   className?: string;
   isCompact?: boolean;
+  onLogout?: () => void;
+  studentName?: string;
 }
 
 export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
   currentLevelTitle,
   className = '',
-  isCompact = false
+  isCompact = false,
+  onLogout,
+  studentName
 }) => {
   // Navigation & Project Meta
   const [projectTitle, setProjectTitle] = useState('Proyek Scratch Saya - DJuragan');
@@ -626,6 +630,8 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         onLoadFromComputer={() => alert('Fitur unggah file .sb3 siap!')}
         onOpenTutorials={() => window.open('https://scratch.mit.edu/ideas', '_blank')}
         onShareProject={() => alert('Proyek berhasil dibagikan!')}
+        onLogout={onLogout}
+        studentName={studentName}
         isCompact={isCompact || stageLayout === 'small'}
       />
 

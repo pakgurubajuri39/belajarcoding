@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Unlock, Lock, RefreshCw, KeyRound, CheckCircle2, Download, Upload, Award, BookOpen, AlertTriangle, UserCheck, Sparkles } from 'lucide-react';
+import { Shield, Unlock, Lock, RefreshCw, KeyRound, CheckCircle2, Download, Upload, Award, BookOpen, AlertTriangle, UserCheck, Sparkles, LogOut } from 'lucide-react';
 import { StudentProgress, UserSession } from '../types';
 import { SYLLABUS_DATA } from '../data/syllabus';
 import { clearAllLocalData, saveProgress } from '../utils/storage';
@@ -9,13 +9,15 @@ interface AdminPanelProps {
   session: UserSession;
   onUpdateProgress: (newProgress: StudentProgress) => void;
   onUpdateSession: (newSession: UserSession) => void;
+  onLogout?: () => void;
 }
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({
   progress,
   session,
   onUpdateProgress,
-  onUpdateSession
+  onUpdateSession,
+  onLogout
 }) => {
   const [activeTab, setActiveTab] = useState<'control' | 'answers' | 'data'>('control');
   const [successMessage, setSuccessMessage] = useState('');
@@ -130,6 +132,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </p>
             </div>
           </div>
+
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 hover:text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-all shadow-md"
+              title="Keluar dari mode Admin dan kembali ke Halaman Masuk"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Keluar dari Admin</span>
+            </button>
+          )}
         </div>
 
         {/* Notification Toast */}

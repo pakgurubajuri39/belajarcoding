@@ -240,6 +240,10 @@ export default function App() {
     setSession(defaultSess);
     setCurrentTab('about');
     setSelectedLevelId(null);
+    setIsLoginModalOpen(false);
+    setIsNotificationCenterOpen(false);
+    setIsQuickTimerOpen(false);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleSelectLevel = (levelId: number) => {
@@ -427,6 +431,8 @@ export default function App() {
                 <ScratchEmbed
                   currentLevelTitle="DJuragan Scratch Live Workspace"
                   tutorialUrl="https://turbowarp.org/editor?fps=60"
+                  onLogout={handleLogout}
+                  studentName={session.studentName}
                 />
               </div>
             )}
@@ -436,6 +442,7 @@ export default function App() {
                 progress={progress}
                 session={session}
                 onSelectLevel={handleSelectLevel}
+                onLogout={handleLogout}
               />
             )}
 
@@ -452,6 +459,7 @@ export default function App() {
                 session={session}
                 onUpdateProgress={setProgress}
                 onUpdateSession={setSession}
+                onLogout={handleLogout}
               />
             )}
           </>
@@ -468,6 +476,7 @@ export default function App() {
         onClose={() => session.isAuthenticated && setIsLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
         currentRole={session.role}
+        onLogout={handleLogout}
       />
 
       {/* Polite 2-Day Inactivity Toast Notification */}

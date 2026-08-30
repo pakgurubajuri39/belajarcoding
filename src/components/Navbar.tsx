@@ -188,6 +188,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               <KeyRound className="w-3.5 h-3.5 text-slate-400" />
             </button>
 
+            {/* Direct Logout / Keluar Button */}
+            <button
+              onClick={onLogout}
+              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/60 rounded-xl text-rose-600 dark:text-rose-400 font-semibold text-xs transition-all flex items-center gap-1.5 shadow-sm"
+              title="Keluar / Logout Akun (Kembali ke Beranda)"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Keluar</span>
+            </button>
+
           </div>
         </div>
 
@@ -249,6 +259,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Admin</span>
             </button>
           )}
+          <button
+            onClick={onLogout}
+            className="px-2 py-1.5 rounded-lg flex items-center gap-1 font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 transition-colors"
+            title="Keluar / Logout Akun"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Keluar</span>
+          </button>
         </div>
       </div>
     </header>

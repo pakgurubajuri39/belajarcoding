@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Globe, FolderOpen, Share2, Lightbulb, Check,
-  ChevronDown, Download, Upload, Zap, User, Edit3, ExternalLink
+  ChevronDown, Download, Upload, Zap, User, Edit3, ExternalLink, LogOut
 } from 'lucide-react';
 
 interface ScratchHeaderProps {
@@ -14,6 +14,7 @@ interface ScratchHeaderProps {
   onNewProject?: () => void;
   onOpenTutorials?: () => void;
   onShareProject?: () => void;
+  onLogout?: () => void;
   studentName?: string;
   isCompact?: boolean;
 }
@@ -28,6 +29,7 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
   onNewProject,
   onOpenTutorials,
   onShareProject,
+  onLogout,
   studentName = 'DJuragan Siswa',
   isCompact = false
 }) => {
@@ -265,6 +267,18 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
               <button onClick={closeMenu} className="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-slate-700">
                 Koleksi Karyaku
               </button>
+              {onLogout && (
+                <button
+                  onClick={() => {
+                    closeMenu();
+                    onLogout();
+                  }}
+                  className="w-full text-left px-3 py-1.5 hover:bg-rose-50 text-rose-600 border-t border-slate-100 flex items-center gap-1.5 font-semibold"
+                >
+                  <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Keluar / Logout</span>
+                </button>
+              )}
             </div>
           )}
         </div>

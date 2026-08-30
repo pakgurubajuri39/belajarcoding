@@ -6,7 +6,7 @@ import {
 import {
   Trophy, Award, Flame, CheckCircle2, Lock, Sparkles, BookOpen, Star,
   ArrowUpRight, Zap, Target, HardDrive, Clock, Activity, Calendar,
-  ShieldCheck, Check, Download, FileText, Loader2, Share2
+  ShieldCheck, Check, Download, FileText, Loader2, Share2, LogOut
 } from 'lucide-react';
 import { StudentProgress, UserSession } from '../types';
 import { SYLLABUS_DATA, BADGES_DATA, AVATAR_OPTIONS } from '../data/syllabus';
@@ -17,12 +17,14 @@ interface ProgressDashboardProps {
   progress: StudentProgress;
   session: UserSession;
   onSelectLevel: (levelId: number) => void;
+  onLogout?: () => void;
 }
 
 export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
   progress,
   session,
-  onSelectLevel
+  onSelectLevel,
+  onLogout
 }) => {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -171,15 +173,29 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
                 </div>
               </div>
 
-              {/* PDF Quick Download Icon Button */}
-              <button
-                onClick={handleDownloadReport}
-                title="Cetak/Unduh Laporan PDF"
-                className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-amber-300 border border-white/10 transition-all flex items-center gap-1.5 text-xs font-bold"
-              >
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">PDF</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {/* PDF Quick Download Icon Button */}
+                <button
+                  onClick={handleDownloadReport}
+                  title="Cetak/Unduh Laporan PDF"
+                  className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-amber-300 border border-white/10 transition-all flex items-center gap-1.5 text-xs font-bold"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">PDF</span>
+                </button>
+
+                {/* Logout / Keluar Button */}
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    title="Keluar / Logout Akun (Kembali ke Halaman Masuk)"
+                    className="p-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 transition-all flex items-center gap-1.5 text-xs font-bold"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="hidden sm:inline">Keluar</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Quick Metrics Bento 3-column with REAL Data */}

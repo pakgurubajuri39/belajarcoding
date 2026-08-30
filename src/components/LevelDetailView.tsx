@@ -696,6 +696,7 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
               currentLevelTitle={`Level ${level.id}: ${level.title}`}
               tutorialUrl={level.scratchTutorialUrl || 'https://scratch.mit.edu/projects/editor/?tutorial=getStarted'}
               isCompact={true}
+              studentName={session.studentName}
             />
           </div>
         </div>
