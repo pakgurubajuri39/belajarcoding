@@ -7,6 +7,7 @@ import { ScratchEmbed } from './components/ScratchEmbed';
 import { CertificateView } from './components/CertificateView';
 import { AdminPanel } from './components/AdminPanel';
 import { LoginModal } from './components/LoginModal';
+import { LoginPage } from './components/LoginPage';
 import { AboutLandingView } from './components/AboutLandingView';
 import { Footer } from './components/Footer';
 import { InAppNotificationToast } from './components/InAppNotificationToast';
@@ -161,7 +162,7 @@ export default function App() {
       setCurrentTab('syllabus');
     }
 
-    // If student or admin, unlock levels accordingly
+    // If student, admin, or guest, unlock levels accordingly
     if (newSession.role === 'student') {
       // Ensure at least level 1 is unlocked
       if (!progress.unlockedLevelIds.includes(1)) {
@@ -177,6 +178,14 @@ export default function App() {
         ...prev,
         unlockedLevelIds: allIds
       }));
+    } else if (newSession.role === 'guest') {
+      if (!progress.unlockedLevelIds.includes(1)) {
+        setProgress(prev => ({
+          ...prev,
+          unlockedLevelIds: [1]
+        }));
+      }
+      setSelectedLevelId(1);
     }
   };
 
@@ -290,6 +299,17 @@ export default function App() {
 
   const currentLevelObj = selectedLevelId ? SYLLABUS_DATA.find(l => l.id === selectedLevelId) : null;
   const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  // When not authenticated (first opening or after logout), show the dedicated Login Page
+  if (!session.isAuthenticated) {
+    return (
+      <LoginPage
+        onLoginSuccess={handleLoginSuccess}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
