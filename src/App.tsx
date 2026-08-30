@@ -23,7 +23,8 @@ import {
   saveSession,
   loadSavedTheme,
   saveSavedTheme,
-  checkAndAwardBadges
+  checkAndAwardBadges,
+  getResumeLevelId
 } from './utils/storage';
 import {
   InAppNotification,
@@ -162,31 +163,48 @@ export default function App() {
       setCurrentTab('syllabus');
     }
 
-    // If student, admin, or guest, unlock levels accordingly
+    // Determine the exact level to resume from previous session
+    let updatedProgressState = { ...progress };
+
     if (newSession.role === 'student') {
       // Ensure at least level 1 is unlocked
-      if (!progress.unlockedLevelIds.includes(1)) {
-        setProgress(prev => ({
-          ...prev,
-          unlockedLevelIds: [1]
-        }));
+      if (!updatedProgressState.unlockedLevelIds.includes(1)) {
+        updatedProgressState.unlockedLevelIds = [1];
       }
     } else if (newSession.role === 'admin') {
       // Admin gets all 20 levels unlocked
       const allIds = SYLLABUS_DATA.map(l => l.id);
-      setProgress(prev => ({
-        ...prev,
-        unlockedLevelIds: allIds
-      }));
+      updatedProgressState.unlockedLevelIds = allIds;
     } else if (newSession.role === 'guest') {
-      if (!progress.unlockedLevelIds.includes(1)) {
-        setProgress(prev => ({
-          ...prev,
-          unlockedLevelIds: [1]
-        }));
+      if (!updatedProgressState.unlockedLevelIds.includes(1)) {
+        updatedProgressState.unlockedLevelIds = [1];
       }
-      setSelectedLevelId(1);
     }
+
+    const resumeLevelId = getResumeLevelId(updatedProgressState, newSession.role);
+    updatedProgressState.lastStudiedLevelId = resumeLevelId;
+    updatedProgressState.lastStudiedDate = new Date().toISOString();
+
+    setProgress(updatedProgressState);
+    setSelectedLevelId(resumeLevelId);
+
+    // Friendly Welcome Notification Toast
+    const resumedLevelObj = SYLLABUS_DATA.find(l => l.id === resumeLevelId) || SYLLABUS_DATA[0];
+    const isCompleted = updatedProgressState.completedLevelIds.includes(resumeLevelId);
+    
+    const welcomeNotif = addNotification({
+      type: 'tip',
+      title: `Selamat Datang Kembali, ${newSession.studentName}! 🚀`,
+      message: isCompleted
+        ? `Kamu melanjutkan sesi di Level #${resumeLevelId}: "${resumedLevelObj.title}". Semua progres & XP tersimpan rapi!`
+        : `Melanjutkan sesi belajar terakhirmu di Level #${resumeLevelId}: "${resumedLevelObj.title}". Semangat!`,
+      targetLevelId: resumeLevelId,
+      badge: `Lanjut Level #${resumeLevelId}`
+    });
+
+    setNotifications(getStoredNotifications());
+    setActiveToastNotification(welcomeNotif);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleStartTrial = () => {
@@ -201,7 +219,9 @@ export default function App() {
     if (!progress.unlockedLevelIds.includes(1)) {
       setProgress(prev => ({
         ...prev,
-        unlockedLevelIds: [1]
+        unlockedLevelIds: [1],
+        lastStudiedLevelId: 1,
+        lastStudiedDate: new Date().toISOString()
       }));
     }
     setSelectedLevelId(1);
@@ -229,6 +249,11 @@ export default function App() {
       return;
     }
     setSelectedLevelId(levelId);
+    setProgress(prev => ({
+      ...prev,
+      lastStudiedLevelId: levelId,
+      lastStudiedDate: new Date().toISOString()
+    }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -249,6 +274,9 @@ export default function App() {
       ? progress.unlockedLevelIds
       : [...progress.unlockedLevelIds, nextLevelId];
 
+    // Point last studied to next level if valid, else keep current
+    const updatedLastStudied = nextLevelId <= 20 ? nextLevelId : levelId;
+
     const updatedRaw: StudentProgress = {
       ...progress,
       completedLevelIds: newCompletedList,
@@ -257,7 +285,9 @@ export default function App() {
       levelScores: {
         ...progress.levelScores,
         [levelId]: Math.max(progress.levelScores[levelId] || 0, scorePercentage)
-      }
+      },
+      lastStudiedLevelId: updatedLastStudied,
+      lastStudiedDate: new Date().toISOString()
     };
 
     // Check badges
@@ -284,6 +314,11 @@ export default function App() {
         return;
       }
       setSelectedLevelId(nextId);
+      setProgress(prev => ({
+        ...prev,
+        lastStudiedLevelId: nextId,
+        lastStudiedDate: new Date().toISOString()
+      }));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -293,6 +328,11 @@ export default function App() {
     const prevId = selectedLevelId - 1;
     if (prevId >= 1) {
       setSelectedLevelId(prevId);
+      setProgress(prev => ({
+        ...prev,
+        lastStudiedLevelId: prevId,
+        lastStudiedDate: new Date().toISOString()
+      }));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };

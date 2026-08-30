@@ -9,7 +9,7 @@ import {
   Shield, Flame, MousePointerClick, Download, CheckSquare, Sparkle,
   GraduationCap, ExternalLink, ChevronRight, X
 } from 'lucide-react';
-import { STUDENT_PASSCODE, ADMIN_PASSCODE } from '../utils/storage';
+import { STUDENT_PASSCODE, ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
 import { UserSession, SyllabusLevel } from '../types';
 import { AVATAR_OPTIONS, SYLLABUS_DATA, BADGES_DATA } from '../data/syllabus';
 import { BrandLogo } from './BrandLogo';
@@ -25,11 +25,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   theme,
   onToggleTheme
 }) => {
+  const savedProgress = loadProgress();
+  const savedSession = loadSession();
+  const resumeLevelId = getResumeLevelId(savedProgress, 'student');
+  const resumeLevelObj = SYLLABUS_DATA.find(l => l.id === resumeLevelId) || SYLLABUS_DATA[0];
+  const hasPreviousActivity = savedProgress.completedLevelIds.length > 0 || (savedProgress.lastStudiedLevelId && savedProgress.lastStudiedLevelId > 1) || savedProgress.xp > 0;
+
   // Login Form States
   const [loginTab, setLoginTab] = useState<'passcode' | 'trial'>('passcode');
-  const [studentName, setStudentName] = useState('');
+  const [studentName, setStudentName] = useState(
+    savedSession.studentName && savedSession.studentName !== 'Siswa Tamu' && savedSession.studentName !== 'Siswa Uji Coba (Trial)'
+      ? savedSession.studentName
+      : ''
+  );
   const [accessCode, setAccessCode] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_OPTIONS[0].id);
+  const [selectedAvatar, setSelectedAvatar] = useState(savedSession.avatar || AVATAR_OPTIONS[0].id);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -390,6 +400,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               {/* TAB 1: PASSCODE LOGIN */}
               {loginTab === 'passcode' && (
                 <form onSubmit={handlePasscodeSubmit} className="space-y-4">
+                  {hasPreviousActivity && (
+                    <div className="p-3 rounded-2xl bg-indigo-950/70 border border-indigo-500/40 flex items-start gap-2.5 text-xs text-indigo-200">
+                      <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-bold text-white block">Sesi Belajar Tersimpan</span>
+                        <span className="text-[11px] text-slate-300">
+                          Masuk untuk otomatis melanjutkan di <strong>Level #{resumeLevelId}: {resumeLevelObj.title}</strong> ({savedProgress.xp} XP).
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                       Nama Siswa / Pengguna

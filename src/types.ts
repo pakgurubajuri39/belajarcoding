@@ -101,6 +101,8 @@ export interface StudentProgress {
   completedQuizzes: Record<number, number[]>; // levelId -> selected option indices
   notes: Record<number, string>; // student personal notes for each level
   unlockedBadges: string[];
+  lastStudiedLevelId?: number; // Level yang terakhir dibuka / dipelajari siswa (1-20)
+  lastStudiedDate?: string;    // Waktu timestamp sesi belajar terakhir
 }
 
 export interface UserSession {

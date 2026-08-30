@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { StudentProgress, UserSession } from '../types';
 import { SYLLABUS_DATA, BADGES_DATA, AVATAR_OPTIONS } from '../data/syllabus';
-import { getRankFromXp } from '../utils/storage';
+import { getRankFromXp, getResumeLevelId } from '../utils/storage';
 import { generateStudentProgressPDF } from '../utils/pdfReport';
 
 interface ProgressDashboardProps {
@@ -26,6 +26,9 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
 }) => {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+
+  const resumeLevelId = getResumeLevelId(progress, session.role);
+  const resumeLevelObj = SYLLABUS_DATA.find(l => l.id === resumeLevelId) || SYLLABUS_DATA[0];
 
   const rankInfo = getRankFromXp(progress.xp);
   const avatarObj = AVATAR_OPTIONS.find(a => a.id === session.avatar) || AVATAR_OPTIONS[0];
@@ -269,20 +272,29 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
             </div>
           </div>
 
-          {/* Local Storage Device Status Bento */}
-          <div className="p-5 rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          {/* Local Storage Device & Active Session Bento */}
+          <div className="p-5 rounded-3xl bg-slate-900 border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-white shadow-md">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
-                <HardDrive className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-2xl bg-amber-400/20 border border-amber-400/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+                <Target className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-slate-900 dark:text-white">Penyimpanan di Perangkat Siswa</h4>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Progres, XP, dan riwayat belajar tersimpan offline</p>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-xs font-bold text-white">Sesi Belajar: Level #{resumeLevelId}</h4>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950">
+                    Aktif
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-300 line-clamp-1">{resumeLevelObj.title}</p>
               </div>
             </div>
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-              Tersinkron
-            </span>
+            <button
+              onClick={() => onSelectLevel(resumeLevelId)}
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow-md flex-shrink-0 cursor-pointer"
+            >
+              <span>Lanjut Belajar</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
         </div>

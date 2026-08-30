@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   KeyRound, ShieldCheck, UserCheck, Sparkles, Eye, EyeOff, CheckCircle2,
   AlertCircle, ArrowRight, Lock, Laptop, Trophy, Target, Award,
-  BookOpen, Star, Flame, Check, HelpCircle, Code2, Zap, HeartHandshake
+  BookOpen, Star, Flame, Check, HelpCircle, Code2, Zap, HeartHandshake, Play
 } from 'lucide-react';
-import { STUDENT_PASSCODE, ADMIN_PASSCODE } from '../utils/storage';
+import { STUDENT_PASSCODE, ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
 import { UserRole, UserSession } from '../types';
-import { AVATAR_OPTIONS } from '../data/syllabus';
+import { AVATAR_OPTIONS, SYLLABUS_DATA } from '../data/syllabus';
 import { BrandLogo } from './BrandLogo';
 
 interface LoginModalProps {
@@ -23,9 +23,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onLoginSuccess,
   currentRole
 }) => {
+  const savedProgress = loadProgress();
+  const savedSession = loadSession();
+  const resumeLevelId = getResumeLevelId(savedProgress, 'student');
+  const resumeLevelObj = SYLLABUS_DATA.find(l => l.id === resumeLevelId) || SYLLABUS_DATA[0];
+  const hasPreviousActivity = savedProgress.completedLevelIds.length > 0 || (savedProgress.lastStudiedLevelId && savedProgress.lastStudiedLevelId > 1) || savedProgress.xp > 0;
+
   const [accessCode, setAccessCode] = useState('');
-  const [studentName, setStudentName] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_OPTIONS[0].id);
+  const [studentName, setStudentName] = useState(
+    savedSession.studentName && savedSession.studentName !== 'Siswa Tamu' && savedSession.studentName !== 'Siswa Uji Coba (Trial)'
+      ? savedSession.studentName
+      : ''
+  );
+  const [selectedAvatar, setSelectedAvatar] = useState(savedSession.avatar || AVATAR_OPTIONS[0].id);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [activeTab, setActiveTab] = useState<'about' | 'passcode' | 'trial'>('about');
@@ -265,6 +275,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             {/* TAB 2: PASSCODE LOGIN FORM */}
             {activeTab === 'passcode' && (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {hasPreviousActivity && (
+                  <div className="p-3 rounded-2xl bg-indigo-950/80 border border-indigo-500/40 flex items-start gap-2.5 text-xs text-indigo-200">
+                    <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold text-white block">Sesi Belajar Tersimpan</span>
+                      <span className="text-[11px] text-slate-300">
+                        Kamu akan otomatis melanjutkan di <strong>Level #{resumeLevelId}: {resumeLevelObj.title}</strong> ({savedProgress.xp} XP).
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 text-left">
                   <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs mb-1">
                     <KeyRound className="w-3.5 h-3.5" />

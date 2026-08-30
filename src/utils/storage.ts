@@ -1,5 +1,5 @@
 import { StudentProgress, UserSession, UserRole } from '../types';
-import { BADGES_DATA } from '../data/syllabus';
+import { BADGES_DATA, SYLLABUS_DATA } from '../data/syllabus';
 
 const PROGRESS_KEY = 'djuragan_coding_progress_v1';
 const SESSION_KEY = 'djuragan_coding_session_v1';
@@ -17,7 +17,9 @@ export const DEFAULT_PROGRESS: StudentProgress = {
   lastActiveDate: new Date().toISOString().split('T')[0],
   completedQuizzes: {},
   notes: {},
-  unlockedBadges: []
+  unlockedBadges: [],
+  lastStudiedLevelId: 1,
+  lastStudiedDate: new Date().toISOString()
 };
 
 export const DEFAULT_SESSION: UserSession = {
@@ -166,3 +168,41 @@ export function getRankFromXp(xp: number): { rank: string; title: string; level:
     return { rank: 'Mahaguru', title: 'DJuragan Grandmaster', level: 8, nextLevelXp: 5000, progressPercent: 100, icon: '👑' };
   }
 }
+
+/**
+ * Menghitung Level ID yang tepat untuk dilanjutkan (Resume) oleh siswa.
+ * Memastikan siswa tidak kembali ke awal (Level 1) melainkan melanjutkan dari materi terakhir yang dipelajari.
+ */
+export function getResumeLevelId(progress: StudentProgress, role: UserRole): number {
+  if (role === 'guest') return 1;
+
+  // 1. Jika ada catatan level terakhir yang sedang dipelajari dan level tersebut valid & terbuka
+  if (
+    typeof progress.lastStudiedLevelId === 'number' &&
+    progress.lastStudiedLevelId >= 1 &&
+    progress.lastStudiedLevelId <= 20 &&
+    (role === 'admin' || progress.unlockedLevelIds.includes(progress.lastStudiedLevelId) || progress.lastStudiedLevelId === 1)
+  ) {
+    return progress.lastStudiedLevelId;
+  }
+
+  // 2. Jika tidak ada lastStudiedLevelId, cari level pertama yang SUDAH TERBUKA tetapi BELUM SELESAI
+  const firstIncompleteUnlocked = SYLLABUS_DATA.find(
+    (lvl) =>
+      (progress.unlockedLevelIds.includes(lvl.id) || role === 'admin' || lvl.id === 1) &&
+      !progress.completedLevelIds.includes(lvl.id)
+  );
+  if (firstIncompleteUnlocked) {
+    return firstIncompleteUnlocked.id;
+  }
+
+  // 3. Jika semua level yang terbuka sudah selesai, ambil level terbuka tertinggi berikutnya
+  if (progress.unlockedLevelIds && progress.unlockedLevelIds.length > 0) {
+    const highestUnlocked = Math.max(...progress.unlockedLevelIds);
+    return Math.min(20, Math.max(1, highestUnlocked));
+  }
+
+  // 4. Default aman: level 1
+  return 1;
+}
+
