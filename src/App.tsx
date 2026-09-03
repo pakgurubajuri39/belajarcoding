@@ -9,6 +9,7 @@ import { AdminPanel } from './components/AdminPanel';
 import { LoginModal } from './components/LoginModal';
 import { LoginPage } from './components/LoginPage';
 import { AboutLandingView } from './components/AboutLandingView';
+import { MaterialsView } from './components/MaterialsView';
 import { Footer } from './components/Footer';
 import { InAppNotificationToast } from './components/InAppNotificationToast';
 import { NotificationCenterModal } from './components/NotificationCenterModal';
@@ -47,7 +48,7 @@ export default function App() {
   const [isQuickTimerOpen, setIsQuickTimerOpen] = useState(false);
 
   // Active navigation tab
-  const [currentTab, setCurrentTab] = useState<'about' | 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin'>(
+  const [currentTab, setCurrentTab] = useState<'about' | 'syllabus' | 'materials' | 'scratch' | 'progress' | 'certificate' | 'admin'>(
     session.isAuthenticated ? 'syllabus' : 'about'
   );
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null);
@@ -414,6 +415,18 @@ export default function App() {
                 session={session}
                 onSelectLevel={handleSelectLevel}
                 onOpenLoginModal={() => setIsLoginModalOpen(true)}
+                onOpenMaterials={() => {
+                  setCurrentTab('materials');
+                  setSelectedLevelId(null);
+                }}
+              />
+            )}
+
+            {currentTab === 'materials' && (
+              <MaterialsView
+                onSelectLevel={(levelId) => {
+                  setSelectedLevelId(levelId);
+                }}
               />
             )}
 

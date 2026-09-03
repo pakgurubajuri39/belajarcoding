@@ -1,6 +1,7 @@
 import { SyllabusLevel, Badge } from '../types';
+import { LEVEL_DRIVE_LINKS, getMaterialsForLevel } from './learningMaterials';
 
-export const SYLLABUS_DATA: SyllabusLevel[] = [
+const RAW_SYLLABUS_DATA: SyllabusLevel[] = [
   // ==========================================
   // SEMESTER GANJIL (LEVEL 01 - 10)
   // ==========================================
@@ -1883,6 +1884,12 @@ export const SYLLABUS_DATA: SyllabusLevel[] = [
     }
   }
 ];
+
+export const SYLLABUS_DATA: SyllabusLevel[] = RAW_SYLLABUS_DATA.map((lvl) => ({
+  ...lvl,
+  driveMaterialUrl: LEVEL_DRIVE_LINKS[lvl.id] || lvl.driveMaterialUrl,
+  resources: getMaterialsForLevel(lvl.id)
+}));
 
 export const BADGES_DATA: Badge[] = [
   { id: 'first_step', name: 'First Step Coder', icon: 'Sparkles', description: 'Menyelesaikan level pertama di DJuragan Coding', category: 'Starter' },

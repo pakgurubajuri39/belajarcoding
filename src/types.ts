@@ -58,6 +58,16 @@ export interface TroubleshootingTip {
   solution: string;
 }
 
+export interface LearningResource {
+  id: number;
+  title: string;
+  url: string;
+  type: 'drive' | 'youtube' | 'pdf' | 'worksheet' | 'video';
+  category: string;
+  description?: string;
+  targetLevelId?: number;
+}
+
 export interface SyllabusLevel {
   id: number;
   semester: 1 | 2; // 1 = Ganjil, 2 = Genap
@@ -78,6 +88,8 @@ export interface SyllabusLevel {
   keyBlocks: KeyBlock[];
   missionSteps: MissionStep[];
   scratchTutorialUrl?: string;
+  driveMaterialUrl?: string;
+  resources?: LearningResource[];
   quizQuestions: QuizQuestion[];
   challenge: Challenge;
 }

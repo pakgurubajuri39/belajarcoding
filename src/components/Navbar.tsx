@@ -1,13 +1,13 @@
 import React from 'react';
-import { Sun, Moon, Sparkles, Trophy, BookOpen, BarChart3, Bot, KeyRound, Award, Shield, Laptop, LogOut, Settings, Bell } from 'lucide-react';
+import { Sun, Moon, Sparkles, Trophy, BookOpen, BarChart3, Bot, KeyRound, Award, Shield, Laptop, LogOut, Settings, Bell, FolderDown } from 'lucide-react';
 import { UserRole, UserSession, StudentProgress } from '../types';
 import { BrandLogo } from './BrandLogo';
 import { getRankFromXp } from '../utils/storage';
 import { AVATAR_OPTIONS } from '../data/syllabus';
 
 interface NavbarProps {
-  currentTab: 'about' | 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin';
-  setCurrentTab: (tab: 'about' | 'syllabus' | 'scratch' | 'progress' | 'certificate' | 'admin') => void;
+  currentTab: 'about' | 'syllabus' | 'materials' | 'scratch' | 'progress' | 'certificate' | 'admin';
+  setCurrentTab: (tab: 'about' | 'syllabus' | 'materials' | 'scratch' | 'progress' | 'certificate' | 'admin') => void;
   session: UserSession;
   progress: StudentProgress;
   theme: 'dark' | 'light';
@@ -71,6 +71,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <BookOpen className="w-3.5 h-3.5" />
               <span>Silabus 20 Level</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('materials')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                currentTab === 'materials'
+                  ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm border border-slate-200 dark:border-slate-700 font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <FolderDown className="w-3.5 h-3.5" />
+              <span>Modul & Materi</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-400/20 text-amber-600 dark:text-amber-400 font-extrabold">54</span>
             </button>
 
             <button
@@ -220,6 +233,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>Silabus</span>
+          </button>
+          <button
+            onClick={() => setCurrentTab('materials')}
+            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
+              currentTab === 'materials' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            <FolderDown className="w-3.5 h-3.5" />
+            <span>Materi (54)</span>
           </button>
           <button
             onClick={() => setCurrentTab('scratch')}

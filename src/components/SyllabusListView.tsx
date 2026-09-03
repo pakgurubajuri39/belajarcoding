@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import {
   BookOpen, CheckCircle2, Lock, Sparkles, ArrowRight, Play, Award,
-  Clock, Shield, Star, Filter, Layers, Zap, HardDrive, Cpu, Terminal
+  Clock, Shield, Star, Filter, Layers, Zap, HardDrive, Cpu, Terminal,
+  FolderDown, ExternalLink
 } from 'lucide-react';
 import { SyllabusLevel, StudentProgress, UserSession } from '../types';
 import { SYLLABUS_DATA } from '../data/syllabus';
@@ -13,13 +14,15 @@ interface SyllabusListViewProps {
   session: UserSession;
   onSelectLevel: (levelId: number) => void;
   onOpenLoginModal: () => void;
+  onOpenMaterials?: () => void;
 }
 
 export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
   progress,
   session,
   onSelectLevel,
-  onOpenLoginModal
+  onOpenLoginModal,
+  onOpenMaterials
 }) => {
   const [selectedSemester, setSelectedSemester] = useState<0 | 1 | 2>(0); // 0 = Semua, 1 = Ganjil, 2 = Genap
   const [searchQuery, setSearchQuery] = useState('');
@@ -218,6 +221,31 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
         </div>
       )}
 
+      {/* 54 Materials & Drive Links Banner */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950">
+              TERSEDIA 54 MATERI RESMI
+            </span>
+            <span className="text-xs font-bold text-amber-400">Google Drive & Worksheet</span>
+          </div>
+          <p className="text-xs text-slate-300">
+            Setiap level silabus terhubung langsung dengan modul Google Drive resmi. Akses modul materi di setiap kartu atau buka Repositori 54 Modul.
+          </p>
+        </div>
+        {onOpenMaterials && (
+          <button
+            onClick={onOpenMaterials}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs shadow-md flex-shrink-0 flex items-center gap-2 transition-all cursor-pointer"
+          >
+            <FolderDown className="w-4 h-4" />
+            <span>Pusat Materi (54 Modul)</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
       {/* Filters and Controls Bento Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-slate-100 dark:bg-slate-900/50 p-2 rounded-2xl border border-slate-200 dark:border-slate-800">
         
@@ -395,36 +423,53 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
         </div>
 
         {/* Action Button */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 italic truncate max-w-[180px]">
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 italic truncate max-w-[140px] sm:max-w-[180px]">
             {lvl.indicator}
           </span>
 
-          {isUnlocked ? (
-            <button
-              onClick={() => onSelectLevel(lvl.id)}
-              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer ${
-                isCurrentActiveSession
-                  ? 'bg-gradient-to-r from-amber-400 to-indigo-600 hover:from-amber-300 hover:to-indigo-500 text-slate-950 font-black shadow-md shadow-amber-400/20 scale-105'
-                  : isCompleted
-                  ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200'
-                  : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/25'
-              }`}
-            >
-              <span>
-                {isCurrentActiveSession ? '▶ Lanjutkan Belajar' : isCompleted ? 'Pelajari Ulang' : 'Mulai Belajar'}
-              </span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          ) : (
-            <button
-              onClick={onOpenLoginModal}
-              className="px-3.5 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold text-xs flex items-center gap-1.5 hover:text-white cursor-pointer"
-            >
-              <Lock className="w-3 h-3" />
-              <span>Buka Kunci</span>
-            </button>
-          )}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {lvl.driveMaterialUrl && (
+              <a
+                href={lvl.driveMaterialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="px-2.5 py-1.5 rounded-xl bg-amber-400/10 hover:bg-amber-400/20 text-amber-600 dark:text-amber-400 border border-amber-400/30 text-xs font-bold flex items-center gap-1 transition-all"
+                title="Buka Modul Pembelajaran Resmi di Google Drive"
+              >
+                <FolderDown className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Drive</span>
+                <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+              </a>
+            )}
+
+            {isUnlocked ? (
+              <button
+                onClick={() => onSelectLevel(lvl.id)}
+                className={`px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer ${
+                  isCurrentActiveSession
+                    ? 'bg-gradient-to-r from-amber-400 to-indigo-600 hover:from-amber-300 hover:to-indigo-500 text-slate-950 font-black shadow-md shadow-amber-400/20 scale-105'
+                    : isCompleted
+                    ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200'
+                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/25'
+                }`}
+              >
+                <span>
+                  {isCurrentActiveSession ? '▶ Lanjutkan Belajar' : isCompleted ? 'Pelajari Ulang' : 'Mulai Belajar'}
+                </span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <button
+                onClick={onOpenLoginModal}
+                className="px-3.5 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold text-xs flex items-center gap-1.5 hover:text-white cursor-pointer"
+              >
+                <Lock className="w-3 h-3" />
+                <span>Buka Kunci</span>
+              </button>
+            )}
+          </div>
         </div>
       </motion.div>
     );

@@ -4,7 +4,8 @@ import confetti from 'canvas-confetti';
 import {
   BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, HelpCircle,
   Play, Laptop, Award, ArrowRight, Lightbulb, Code2, AlertTriangle, MessageSquare,
-  Check, X, Target, Wrench, FileText, CheckSquare, Square, Save, RotateCcw, Share2, Compass
+  Check, X, Target, Wrench, FileText, CheckSquare, Square, Save, RotateCcw, Share2, Compass,
+  ExternalLink, FolderDown
 } from 'lucide-react';
 import { SyllabusLevel, StudentProgress, UserSession, BlockLine } from '../types';
 import { ScratchEmbed } from './ScratchEmbed';
@@ -196,6 +197,21 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
               {level.summary}
             </p>
+
+            {level.driveMaterialUrl && (
+              <div className="pt-1 flex flex-wrap items-center gap-2">
+                <a
+                  href={level.driveMaterialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all transform active:scale-95"
+                >
+                  <FolderDown className="w-4 h-4" />
+                  <span>Buka Modul di Google Drive</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            )}
           </div>
 
           <div className="flex-shrink-0 flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 border border-white/10 text-center min-w-[140px] shadow-inner">
@@ -331,6 +347,94 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
                 {level.conceptExplanation}
               </p>
             </div>
+
+            {/* Official Google Drive Learning Material & Supplementary Resources */}
+            {(level.driveMaterialUrl || (level.resources && level.resources.length > 0)) && (
+              <div className="rounded-3xl bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 border border-indigo-500/40 p-6 shadow-lg text-white space-y-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/5 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-500/30 pb-3">
+                  <div className="flex items-center gap-2.5 text-amber-400 font-bold text-sm">
+                    <FolderDown className="w-5 h-5 text-amber-400" />
+                    <span>Modul Pembelajaran Resmi (Google Drive / Video)</span>
+                  </div>
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-400/10 text-amber-400 border border-amber-400/20 font-bold self-start sm:self-auto">
+                    Materi Sesuai Silabus
+                  </span>
+                </div>
+
+                {level.driveMaterialUrl && (
+                  <div className="p-4 rounded-2xl bg-indigo-900/40 border border-indigo-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-mono font-black text-[10px]">
+                          MODUL UTAMA LEVEL {level.id}
+                        </span>
+                        <h4 className="text-sm font-black text-white">
+                          {level.title}
+                        </h4>
+                      </div>
+                      <p className="text-xs text-slate-300">
+                        Buka dokumen panduan asli di Google Drive untuk dibaca bersama instruktur atau dipelajari mandiri.
+                      </p>
+                    </div>
+
+                    <a
+                      href={level.driveMaterialUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center gap-2 shadow-md shadow-amber-400/20 flex-shrink-0 transition-all transform active:scale-95"
+                    >
+                      <span>Buka Google Drive</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                )}
+
+                {/* Supplementary resources list */}
+                {level.resources && level.resources.length > 0 && (
+                  <div className="space-y-2.5 pt-2">
+                    <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider block">
+                      Modul Terkait & Bahan Pendukung Level Ini:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {level.resources.map((res) => (
+                        <div
+                          key={res.id}
+                          className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-between gap-3 hover:border-indigo-400/50 transition-colors"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-mono font-bold">
+                                #{res.id}
+                              </span>
+                              <span className={`text-[10px] font-bold ${
+                                res.type === 'youtube' ? 'text-rose-400' : res.type === 'worksheet' ? 'text-emerald-400' : 'text-amber-400'
+                              }`}>
+                                {res.type === 'youtube' ? 'Video' : res.type === 'worksheet' ? 'Worksheet' : 'Dokumen'}
+                              </span>
+                            </div>
+                            <h5 className="text-xs font-bold text-white truncate" title={res.title}>
+                              {res.title}
+                            </h5>
+                          </div>
+
+                          <a
+                            href={res.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex-shrink-0 transition-colors"
+                            title={`Buka ${res.title}`}
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* 3. Visual Scratch Pseudocode Block Preview */}
             {level.scriptPseudocode && level.scriptPseudocode.length > 0 && (
