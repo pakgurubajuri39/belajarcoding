@@ -76,7 +76,7 @@ export const CheckRegistrationStatus: React.FC<CheckRegistrationStatusProps> = (
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Memeriksa Database Firebase...</span>
+              <span>Memeriksa Database...</span>
             </>
           ) : (
             <>

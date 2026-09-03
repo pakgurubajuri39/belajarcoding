@@ -98,7 +98,7 @@ export const StudentRegistrationForm: React.FC<StudentRegistrationFormProps> = (
             Pendaftaran Berhasil Dikirim! 🚀
           </h3>
           <p className="text-xs text-slate-300 mt-1 max-w-sm mx-auto">
-            Terima kasih <strong className="text-amber-300">{submittedData.fullName}</strong>. Data pendaftaranmu telah masuk ke server Firebase dan sedang ditinjau oleh Admin / Guru Pembina.
+            Terima kasih <strong className="text-amber-300">{submittedData.fullName}</strong>. Data pendaftaranmu telah masuk ke database dan sedang ditinjau oleh Admin / Guru Pembina.
           </p>
         </div>
 
@@ -321,7 +321,7 @@ export const StudentRegistrationForm: React.FC<StudentRegistrationFormProps> = (
         {isLoading ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Mengirim ke Server Firebase...</span>
+            <span>Mengirim ke Database...</span>
           </>
         ) : (
           <>

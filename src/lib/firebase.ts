@@ -16,18 +16,26 @@ import {
 import firebaseConfig from '../../firebase-applet-config.json';
 import { StudentRegistration, RegistrationStatus } from '../types';
 
-// Inisialisasi Firebase App
+// Inisialisasi Database App
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Inisialisasi Firestore dengan Database ID khusus jika tersedia
-export const db = firebaseConfig.firestoreDatabaseId
-  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
-  : getFirestore(app);
+// Inisialisasi Firestore Database
+let firestoreInstance;
+try {
+  if (firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)') {
+    firestoreInstance = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+  } else {
+    firestoreInstance = getFirestore(app);
+  }
+} catch {
+  firestoreInstance = getFirestore(app);
+}
+export const db = firestoreInstance;
 
 export const REGISTRATIONS_COLLECTION = 'student_registrations';
 
 /**
- * Mendaftarkan siswa baru ke Firebase Firestore
+ * Mendaftarkan siswa baru ke Database
  * Status awal selalu 'pending' (menunggu review admin)
  */
 export async function registerStudentInFirebase(data: {
@@ -95,7 +103,7 @@ export async function registerStudentInFirebase(data: {
     console.error('Error registerStudentInFirebase:', error);
     return {
       success: false,
-      message: error?.message || 'Gagal mendaftar ke server Firebase. Periksa koneksi internet.'
+      message: error?.message || 'Gagal mendaftar ke database. Periksa koneksi internet.'
     };
   }
 }
@@ -176,7 +184,7 @@ export async function loginStudentWithFirebase(
     console.error('Error loginStudentWithFirebase:', error);
     return {
       success: false,
-      message: 'Terjadi kendala saat menghubungkan ke database Firebase.'
+      message: 'Terjadi kendala saat menghubungkan ke database.'
     };
   }
 }

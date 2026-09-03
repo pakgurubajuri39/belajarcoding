@@ -6,7 +6,7 @@ import {
   BookOpen, Star, Flame, Check, HelpCircle, Code2, Zap, HeartHandshake, Play,
   LogOut, X, Clock, Loader2, Mail
 } from 'lucide-react';
-import { STUDENT_PASSCODE, ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
+import { ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
 import { UserRole, UserSession, StudentRegistration } from '../types';
 import { AVATAR_OPTIONS, SYLLABUS_DATA } from '../data/syllabus';
 import { BrandLogo } from './BrandLogo';
@@ -76,19 +76,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       return;
     }
 
-    if (trimmedInput === STUDENT_PASSCODE || trimmedPass === STUDENT_PASSCODE) {
-      // Student Full Access Master Passcode
-      onLoginSuccess({
-        isAuthenticated: true,
-        role: 'student',
-        studentName: studentName.trim() || 'Siswa Juara Coding',
-        avatar: selectedAvatar,
-        loginDate: new Date().toISOString()
-      });
-      return;
-    }
-
-    // Firebase Registered Student
+    // Database Registered Student (Wajib terdaftar dan disetujui Admin)
     setIsLoggingIn(true);
     try {
       const res = await loginStudentWithFirebase(trimmedInput, trimmedPass);
@@ -296,7 +284,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     <span>Akses Penuh 20 Level Silabus</span>
                   </div>
                   <p className="text-[11px] text-slate-300">
-                    Masuk dengan email pendaftaran siswa yang sudah di-approve Admin, atau kode akses khusus guru/siswa.
+                    Masuk dengan email pendaftaran siswa yang sudah disetujui Admin, atau passcode khusus guru/admin.
                   </p>
                 </div>
 
@@ -304,9 +292,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                      Email Siswa / Kode Akses
+                      Email Siswa Terdaftar
                     </label>
-                    <span className="text-[11px] text-amber-400">Firebase / Passcode</span>
+                    <span className="text-[11px] text-emerald-400 font-semibold">Database Terverifikasi</span>
                   </div>
                   <div className="relative">
                     <input
@@ -314,7 +302,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       required
                       value={emailOrCode}
                       onChange={(e) => setEmailOrCode(e.target.value)}
-                      placeholder="Contoh: siswa@email.com atau djuragan39"
+                      placeholder="Masukkan email siswa terdaftar..."
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-sm font-mono transition-all"
                     />
                     <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -391,7 +379,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   {isLoggingIn ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Memverifikasi Akun di Firebase...</span>
+                      <span>Memverifikasi Akun di Database...</span>
                     </>
                   ) : (
                     <>

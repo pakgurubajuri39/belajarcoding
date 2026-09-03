@@ -5,7 +5,6 @@ const PROGRESS_KEY = 'djuragan_coding_progress_v1';
 const SESSION_KEY = 'djuragan_coding_session_v1';
 const THEME_KEY = 'djuragan_coding_theme_v1';
 
-export const STUDENT_PASSCODE = 'djuragan39';
 export const ADMIN_PASSCODE = 'bajuri39';
 
 export const DEFAULT_PROGRESS: StudentProgress = {

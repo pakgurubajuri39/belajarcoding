@@ -91,7 +91,7 @@ export const AdminStudentApproval: React.FC<AdminStudentApprovalProps> = ({
   };
 
   const handleDelete = async (student: StudentRegistration) => {
-    if (window.confirm(`Hapus pendaftaran ${student.fullName}? Data akan dihapus permanen dari database Firebase.`)) {
+    if (window.confirm(`Hapus pendaftaran ${student.fullName}? Data akan dihapus permanen dari database.`)) {
       setProcessingId(student.id);
       try {
         const res = await deleteStudentRegistration(student.id);
@@ -275,7 +275,7 @@ export const AdminStudentApproval: React.FC<AdminStudentApprovalProps> = ({
       {loading ? (
         <div className="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <Loader2 className="w-8 h-8 mx-auto text-amber-500 animate-spin mb-3" />
-          <p className="text-xs text-slate-500">Memuat data pendaftaran dari Firebase Firestore...</p>
+          <p className="text-xs text-slate-500">Memuat data pendaftaran dari database...</p>
         </div>
       ) : filteredRegistrations.length === 0 ? (
         <div className="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">

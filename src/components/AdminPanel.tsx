@@ -166,7 +166,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           }`}
         >
           <UserCheck className="w-4 h-4" />
-          <span>Persetujuan Siswa (Review &amp; Approve)</span>
+          <span>Persetujuan Siswa (Approve / Tolak)</span>
         </button>
 
         <button
@@ -273,19 +273,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <KeyRound className="w-5 h-5 text-amber-500" />
-              <span>Daftar Kode Akses Resmi</span>
+              <span>Sistem Akses Siswa &amp; Kredensial Admin</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
-                <span className="font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider text-[10px]">
-                  Kode Siswa (Full Access):
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider text-[10px]">
+                  Akses Masuk Siswa:
                 </span>
-                <div className="text-base font-mono font-bold text-slate-900 dark:text-white bg-slate-200 dark:bg-slate-950 p-2 rounded-xl border border-slate-300 dark:border-slate-800">
-                  djuragan39
+                <div className="text-sm font-bold text-slate-900 dark:text-white bg-slate-200 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-300 dark:border-slate-800">
+                  Pendaftaran &amp; Persetujuan Admin
                 </div>
                 <p className="text-slate-500 dark:text-slate-400">
-                  Berikan kode ini kepada siswa setelah terdaftar di kelas ekstrakurikuler.
+                  Siswa wajib mendaftar dengan email resmi. Admin/Guru memeriksa dan menyetujui akun di tab <strong>Persetujuan Siswa</strong>.
                 </p>
               </div>
 
@@ -297,7 +297,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   bajuri39
                 </div>
                 <p className="text-slate-500 dark:text-slate-400">
-                  Digunakan oleh instruktur untuk mengontrol materi, kuis, dan sertifikat.
+                  Digunakan oleh instruktur untuk mengontrol materi, kuis, dan persetujuan siswa.
                 </p>
               </div>
             </div>

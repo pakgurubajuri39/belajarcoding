@@ -10,7 +10,7 @@ import {
   GraduationCap, ExternalLink, ChevronRight, X, UserCheck, Loader2,
   Mail, School, Phone
 } from 'lucide-react';
-import { STUDENT_PASSCODE, ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
+import { ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
 import { UserSession, SyllabusLevel, StudentRegistration } from '../types';
 import { AVATAR_OPTIONS, SYLLABUS_DATA, BADGES_DATA } from '../data/syllabus';
 import { BrandLogo } from './BrandLogo';
@@ -82,19 +82,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       return;
     }
 
-    // 2. Direct Passcode Master Student Demo Check
-    if (trimmedInput === STUDENT_PASSCODE || trimmedPass === STUDENT_PASSCODE) {
-      onLoginSuccess({
-        isAuthenticated: true,
-        role: 'student',
-        studentName: studentName.trim() || 'Siswa Juara Coding',
-        avatar: selectedAvatar,
-        loginDate: new Date().toISOString()
-      });
-      return;
-    }
-
-    // 3. Email-based Firebase Registered Student Login
+    // 2. Email-based Database Registered Student Login (Wajib terdaftar dan disetujui Admin)
     setIsLoggingIn(true);
     try {
       const result = await loginStudentWithFirebase(trimmedInput, trimmedPass);
@@ -361,7 +349,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/80">
                 <CheckCircle2 className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                <span><strong>Persetujuan Guru:</strong> Backend Firebase Resmi</span>
+                <span><strong>Persetujuan Guru:</strong> Backend Database Resmi</span>
               </div>
             </div>
 
@@ -417,7 +405,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   <p className="text-[11px] text-slate-400">Pendaftaran siswa, review admin, &amp; akses belajar</p>
                 </div>
                 <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
-                  Firebase Aktif
+                  Database Aktif
                 </span>
               </div>
 
@@ -507,13 +495,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     </div>
                   )}
 
-                  {/* Input Email / Kode Akses */}
+                  {/* Input Email Siswa Terdaftar */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                        Email Siswa / Kode Akses
+                        Email Siswa Terdaftar
                       </label>
-                      <span className="text-[10px] text-amber-400 font-semibold">Firebase / Passcode</span>
+                      <span className="text-[10px] text-emerald-400 font-semibold">Database Terverifikasi</span>
                     </div>
                     <div className="relative">
                       <input
@@ -521,7 +509,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                         required
                         value={emailOrCode}
                         onChange={(e) => setEmailOrCode(e.target.value)}
-                        placeholder="Contoh: nama@email.com atau djuragan39"
+                        placeholder="Masukkan email siswa terdaftar..."
                         className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs font-mono transition-all"
                       />
                       <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -570,7 +558,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                         <span>Pendaftaran Masih Menunggu Persetujuan Admin</span>
                       </div>
                       <p className="text-[11px] text-slate-300">
-                        Halo <strong>{pendingNotice.fullName}</strong>, data Anda telah tersimpan di Firebase. Guru pembina akan mereview akun Anda di Panel Admin sebelum akses belajar terbuka.
+                        Halo <strong>{pendingNotice.fullName}</strong>, data Anda telah tersimpan di database. Guru pembina akan mereview akun Anda di Panel Admin sebelum akses belajar terbuka.
                       </p>
                       <button
                         type="button"
@@ -598,7 +586,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     {isLoggingIn ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Memverifikasi Akun di Firebase...</span>
+                        <span>Memverifikasi Akun di Database...</span>
                       </>
                     ) : (
                       <>
@@ -701,7 +689,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
               <div className="pt-2 text-center text-[10px] text-slate-400 flex items-center justify-center gap-1.5 border-t border-slate-800">
                 <Laptop className="w-3 h-3 text-cyan-400" />
-                <span>Didukung Backend Firebase Firestore &amp; Penyimpanan Terenkripsi.</span>
+                <span>Didukung Backend Database Cloud Real-time &amp; Penyimpanan Terenkripsi.</span>
               </div>
 
             </div>

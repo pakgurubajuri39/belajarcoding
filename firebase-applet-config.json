@@ -1,12 +1,12 @@
 {
-  "projectId": "apt-flames-wlcf1",
-  "appId": "1:69180286899:web:9bf7901666e9bb73350dc6",
-  "apiKey": "AIzaSyATKTn38XEyZ9TrXKQgz7iAS8_A5xY9xg0",
-  "authDomain": "apt-flames-wlcf1.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-djuragancoding-71da3f95-c81c-42e2-84c5-5c8df72905e9",
-  "storageBucket": "apt-flames-wlcf1.firebasestorage.app",
-  "messagingSenderId": "69180286899",
+  "projectId": "gen-lang-client-0128404600",
+  "appId": "1:18728086070:web:d00e33237083dd4a6a4697",
+  "apiKey": "AIzaSyCphNvDJAQtHICcUS3vIBXD-ZkJ8ykt2Pg",
+  "authDomain": "gen-lang-client-0128404600.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "gen-lang-client-0128404600.firebasestorage.app",
+  "messagingSenderId": "18728086070",
   "measurementId": "",
-  "oAuthClientId": "69180286899-eonpmf1ebrl1236j06cmoce192r67usn.apps.googleusercontent.com",
+  "oAuthClientId": "",
   "recaptchaSiteKey": ""
 }
