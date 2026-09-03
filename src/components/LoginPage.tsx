@@ -16,7 +16,7 @@ import { AVATAR_OPTIONS, SYLLABUS_DATA, BADGES_DATA } from '../data/syllabus';
 import { BrandLogo } from './BrandLogo';
 import { StudentRegistrationForm } from './StudentRegistrationForm';
 import { CheckRegistrationStatus } from './CheckRegistrationStatus';
-import { loginStudentWithFirebase } from '../lib/firebase';
+import { loginStudentWithFirebase, checkStudentStatusByEmail } from '../lib/firebase';
 
 interface LoginPageProps {
   onLoginSuccess: (session: UserSession) => void;
@@ -48,6 +48,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isCheckingStatusLive, setIsCheckingStatusLive] = useState(false);
+  const [statusFeedback, setStatusFeedback] = useState('');
+  const [continueNotice, setContinueNotice] = useState('');
   const [pendingNotice, setPendingNotice] = useState<StudentRegistration | null>(null);
 
   // Curriculum Stage Filter State
@@ -60,6 +63,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const handleMainLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    setContinueNotice('');
     setPendingNotice(null);
 
     const trimmedInput = emailOrCode.trim();
@@ -88,6 +92,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       const result = await loginStudentWithFirebase(trimmedInput, trimmedPass);
       if (result.success && result.registration) {
         // Status is approved! Student can immediately start learning
+        localStorage.setItem('djuragan_last_student_email', result.registration.email);
         onLoginSuccess({
           isAuthenticated: true,
           role: 'student',
@@ -100,15 +105,162 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         });
       } else {
         if (result.status === 'pending' && result.registration) {
+          // Account is under review: friendly message & strictly prevent further access
           setPendingNotice(result.registration);
+          setErrorMessage('');
+        } else {
+          setErrorMessage(result.message || 'Email atau kata sandi tidak cocok.');
         }
-        setErrorMessage(result.message || 'Email atau kata sandi tidak cocok.');
       }
     } catch (err: any) {
       setErrorMessage(err?.message || 'Terjadi kesalahan sistem saat mencoba masuk.');
     } finally {
       setIsLoggingIn(false);
     }
+  };
+
+  // Recheck student status in real-time from Firebase while under review
+  const handleRecheckPendingStatus = async () => {
+    if (!pendingNotice?.email) return;
+    setIsCheckingStatusLive(true);
+    setStatusFeedback('');
+    try {
+      const check = await checkStudentStatusByEmail(pendingNotice.email);
+      if (check.found && check.registration) {
+        if (check.registration.status === 'approved') {
+          // Admin has just approved the account!
+          localStorage.setItem('djuragan_last_student_email', check.registration.email);
+          setPendingNotice(null);
+          onLoginSuccess({
+            isAuthenticated: true,
+            role: 'student',
+            studentName: check.registration.fullName,
+            avatar: check.registration.avatar || selectedAvatar,
+            loginDate: new Date().toISOString(),
+            email: check.registration.email,
+            registrationId: check.registration.id,
+            schoolOrClass: check.registration.schoolOrClass
+          });
+          return;
+        } else if (check.registration.status === 'rejected') {
+          setErrorMessage(`Pendaftaran belum disetujui: ${check.registration.rejectionReason || 'Ditolak oleh admin'}`);
+          setPendingNotice(null);
+          return;
+        } else {
+          setStatusFeedback('Akun Anda masih dalam antrean peninjauan oleh Guru Pembina. Mohon tunggu sebentar ya!');
+          setTimeout(() => setStatusFeedback(''), 5000);
+        }
+      } else {
+        setStatusFeedback('Data akun tidak ditemukan. Silakan periksa kembali email.');
+      }
+    } catch (err: any) {
+      console.error('Error rechecking pending status:', err);
+      setStatusFeedback('Gagal memeriksa status ke database. Coba lagi dalam beberapa detik.');
+    } finally {
+      setIsCheckingStatusLive(false);
+    }
+  };
+
+  // Siswa dapat melanjutkan belajar mengikuti sesi terakhirnya dengan klik "Melanjutkan Kursus"
+  const handleContinueCourse = async () => {
+    setErrorMessage('');
+    setPendingNotice(null);
+
+    // 1. If user already has an active authenticated session
+    if (savedSession.isAuthenticated && savedSession.role === 'student') {
+      if (savedSession.email) {
+        setIsLoggingIn(true);
+        try {
+          const check = await checkStudentStatusByEmail(savedSession.email);
+          if (check.found && check.registration) {
+            if (check.registration.status === 'pending') {
+              setPendingNotice(check.registration);
+              setIsLoggingIn(false);
+              return;
+            }
+            if (check.registration.status === 'rejected') {
+              setErrorMessage('Akses akun ini telah ditolak oleh admin.');
+              setIsLoggingIn(false);
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('Network / offline check warning:', e);
+        } finally {
+          setIsLoggingIn(false);
+        }
+      }
+      onLoginSuccess(savedSession);
+      return;
+    }
+
+    // 2. If student has saved/remembered email
+    const rememberedEmail = savedSession.email || localStorage.getItem('djuragan_last_student_email') || emailOrCode.trim();
+    if (rememberedEmail) {
+      setEmailOrCode(rememberedEmail);
+      setLoginTab('login');
+      scrollToSection('sec-login-portal');
+
+      setIsLoggingIn(true);
+      try {
+        const check = await checkStudentStatusByEmail(rememberedEmail);
+        if (check.found && check.registration) {
+          if (check.registration.status === 'pending') {
+            setPendingNotice(check.registration);
+            setIsLoggingIn(false);
+            return;
+          }
+          if (check.registration.status === 'rejected') {
+            setErrorMessage(`Akun ini belum disetujui: ${check.registration.rejectionReason || 'Ditolak admin'}`);
+            setIsLoggingIn(false);
+            return;
+          }
+
+          // If password matches or was already filled
+          if (studentPassword.trim() && check.registration.password === studentPassword.trim()) {
+            onLoginSuccess({
+              isAuthenticated: true,
+              role: 'student',
+              studentName: check.registration.fullName,
+              avatar: check.registration.avatar || selectedAvatar,
+              loginDate: new Date().toISOString(),
+              email: check.registration.email,
+              registrationId: check.registration.id,
+              schoolOrClass: check.registration.schoolOrClass
+            });
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Error continue course check:', e);
+      } finally {
+        setIsLoggingIn(false);
+      }
+
+      setContinueNotice(`Lanjutkan ke Level #${resumeLevelId}: ${resumeLevelObj.title}. Masukkan kata sandi akunmu.`);
+      const pwdInput = document.getElementById('input-student-password');
+      if (pwdInput) pwdInput.focus();
+      return;
+    }
+
+    // 3. If guest / trial has progress, continue trial session
+    if (savedProgress.lastStudiedLevelId || savedProgress.completedLevelIds.length > 0) {
+      onLoginSuccess({
+        isAuthenticated: true,
+        role: 'guest',
+        studentName: studentName.trim() || 'Siswa Tamu (Trial)',
+        avatar: selectedAvatar,
+        loginDate: new Date().toISOString()
+      });
+      return;
+    }
+
+    // 4. Default: Switch to login tab and focus email
+    setLoginTab('login');
+    scrollToSection('sec-login-portal');
+    setContinueNotice(`Silakan masuk dengan email terdaftar untuk melanjutkan ke Level #${resumeLevelId}.`);
+    const emailInput = document.getElementById('input-email-or-code');
+    if (emailInput) emailInput.focus();
   };
 
   const handleTrialSubmit = (e: React.FormEvent) => {
@@ -355,6 +507,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
             {/* Quick Action Buttons */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
+              {hasPreviousActivity && (
+                <button
+                  onClick={handleContinueCourse}
+                  id="hero-btn-melanjutkan-kursus"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-400/25 flex items-center justify-center gap-2 transition-all transform active:scale-95 cursor-pointer"
+                >
+                  <Play className="w-4 h-4 fill-slate-950" />
+                  <span>Melanjutkan Kursus (Level #{resumeLevelId})</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   setLoginTab('register');
@@ -482,131 +646,244 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
               {/* TAB 1: MASUK (LOGIN) */}
               {loginTab === 'login' && (
-                <form onSubmit={handleMainLoginSubmit} className="space-y-3.5">
-                  {hasPreviousActivity && (
-                    <div className="p-3 rounded-2xl bg-indigo-950/70 border border-indigo-500/40 flex items-start gap-2.5 text-xs text-indigo-200">
-                      <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                <>
+                  {/* FRIENDLY "YOUR ACCOUNT IS UNDER REVIEW" SCREEN (PREVENTS ACCESS UNTIL APPROVED) */}
+                  {pendingNotice ? (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/40 text-left space-y-4 animate-fadeIn shadow-2xl">
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center flex-shrink-0 text-amber-400">
+                          <Clock className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <div>
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 mb-1">
+                            <Clock className="w-3 h-3" />
+                            <span>Status: Menunggu Persetujuan Admin</span>
+                          </div>
+                          <h3 className="text-base font-black text-white">
+                            Akun Anda Sedang Dalam Peninjauan
+                          </h3>
+                          <p className="text-xs text-amber-300/90 font-medium">
+                            Your account is under review
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs text-slate-300 space-y-2 leading-relaxed">
+                        <p>
+                          Halo <strong className="text-amber-300">{pendingNotice.fullName}</strong>! Data pendaftaran Anda telah berhasil terhubung dan tersimpan di <strong>Database</strong>.
+                        </p>
+                        <p className="text-[11px] text-slate-400">
+                          Saat ini akun Anda sedang dalam proses peninjauan oleh <strong>Guru Pembina / Administrator</strong> sebelum akses belajar silabus 20 modul dibuka. Akses pembelajaran akan otomatis aktif setelah admin menyetujui akun Anda.
+                        </p>
+
+                        {/* Student Details from Firebase */}
+                        <div className="pt-2 border-t border-slate-700/70 grid grid-cols-2 gap-2 text-[11px]">
+                          <div>
+                            <span className="text-slate-400 block text-[10px]">Email Terdaftar:</span>
+                            <span className="font-mono text-slate-200 truncate block">{pendingNotice.email}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 block text-[10px]">Sekolah / Kelas:</span>
+                            <span className="text-slate-200 truncate block">{pendingNotice.schoolOrClass}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {statusFeedback && (
+                        <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-200 text-xs flex items-center gap-2 animate-fadeIn">
+                          <Clock className="w-4 h-4 flex-shrink-0 text-amber-400" />
+                          <span>{statusFeedback}</span>
+                        </div>
+                      )}
+
+                      {/* Actions inside Pending Review Notice */}
+                      <div className="space-y-2 pt-1">
+                        <button
+                          type="button"
+                          disabled={isCheckingStatusLive}
+                          onClick={handleRecheckPendingStatus}
+                          className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer disabled:opacity-50"
+                        >
+                          {isCheckingStatusLive ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Memeriksa Status ke Database...</span>
+                            </>
+                          ) : (
+                            <>
+                              <ShieldCheck className="w-4 h-4" />
+                              <span>Periksa Status Persetujuan Terkini</span>
+                            </>
+                          )}
+                        </button>
+
+                        <div className="flex gap-2">
+                          <a
+                            href={`https://wa.me/6281234567890?text=${encodeURIComponent(
+                              `Halo Admin/Guru DJuragan Coding, saya telah mendaftar dengan nama: ${pendingNotice.fullName} (${pendingNotice.email}). Mohon bantuannya untuk persetujuan akun agar saya dapat mulai belajar. Terima kasih!`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 py-2 px-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 font-semibold text-[11px] flex items-center justify-center gap-1.5 transition-all"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>Hubungi Guru</span>
+                          </a>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPendingNotice(null);
+                              setErrorMessage('');
+                            }}
+                            className="flex-1 py-2 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-semibold text-[11px] transition-all"
+                          >
+                            Ganti Akun
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleMainLoginSubmit} className="space-y-3.5">
+                      {/* CARD MELANJUTKAN KURSUS (SESI TERAKHIR) */}
+                      {hasPreviousActivity && (
+                        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-indigo-950/80 to-slate-900 border border-amber-500/40 shadow-xl space-y-2.5">
+                          <div className="flex items-start justify-between gap-2.5">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 font-black flex items-center justify-center text-sm shadow-md shadow-amber-500/30 flex-shrink-0">
+                                #{resumeLevelId}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1 text-[10px] text-amber-400 font-bold uppercase tracking-wider">
+                                  <Sparkles className="w-3 h-3" />
+                                  <span>Sesi Belajar Terakhir</span>
+                                </div>
+                                <h4 className="text-xs font-bold text-white leading-tight">
+                                  Level #{resumeLevelId}: {resumeLevelObj.title}
+                                </h4>
+                                <p className="text-[10px] text-slate-300 mt-0.5">
+                                  {savedSession.studentName ? `Siswa: ${savedSession.studentName}` : 'Siswa DJuragan'} • {savedProgress.xp} XP • {savedProgress.completedLevelIds.length}/20 Modul Selesai
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            id="btn-melanjutkan-kursus"
+                            onClick={handleContinueCourse}
+                            className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] cursor-pointer"
+                          >
+                            <Play className="w-3.5 h-3.5 fill-slate-950" />
+                            <span>Melanjutkan Kursus</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+
+                      {continueNotice && (
+                        <div className="p-3 rounded-xl bg-indigo-500/15 border border-indigo-500/40 text-indigo-200 text-xs flex items-start gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                          <span>{continueNotice}</span>
+                        </div>
+                      )}
+
+                      {/* Input Email Siswa Terdaftar */}
                       <div>
-                        <span className="font-bold text-white block">Sesi Belajar Tersimpan</span>
-                        <span className="text-[11px] text-slate-300">
-                          Lanjutkan di <strong>Level #{resumeLevelId}: {resumeLevelObj.title}</strong> ({savedProgress.xp} XP).
-                        </span>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                            Email Siswa Terdaftar
+                          </label>
+                          <span className="text-[10px] text-emerald-400 font-semibold">Database Terverifikasi</span>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            required
+                            id="input-email-or-code"
+                            value={emailOrCode}
+                            onChange={(e) => setEmailOrCode(e.target.value)}
+                            placeholder="Masukkan email siswa terdaftar..."
+                            className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs font-mono transition-all"
+                          />
+                          <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        </div>
                       </div>
-                    </div>
-                  )}
 
-                  {/* Input Email Siswa Terdaftar */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                        Email Siswa Terdaftar
-                      </label>
-                      <span className="text-[10px] text-emerald-400 font-semibold">Database Terverifikasi</span>
-                    </div>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        required
-                        value={emailOrCode}
-                        onChange={(e) => setEmailOrCode(e.target.value)}
-                        placeholder="Masukkan email siswa terdaftar..."
-                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs font-mono transition-all"
-                      />
-                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    </div>
-                  </div>
-
-                  {/* Input Kata Sandi */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1">
-                        <Lock className="w-3 h-3 text-amber-400" />
-                        <span>Kata Sandi / Verifikasi</span>
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setLoginTab('status')}
-                        className="text-[10px] text-slate-400 hover:text-amber-400 transition-colors"
-                      >
-                        Lupa status akun?
-                      </button>
-                    </div>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={studentPassword}
-                        onChange={(e) => setStudentPassword(e.target.value)}
-                        placeholder="Masukkan kata sandi akun..."
-                        className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs tracking-wider font-mono transition-all"
-                      />
-                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
-                      >
-                        {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Pending Notice Banner if student tried logging in before approval */}
-                  {pendingNotice && (
-                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs space-y-1.5 animate-fadeIn">
-                      <div className="flex items-center gap-1.5 font-bold">
-                        <Clock className="w-4 h-4 text-amber-400 animate-pulse" />
-                        <span>Pendaftaran Masih Menunggu Persetujuan Admin</span>
+                      {/* Input Kata Sandi */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1">
+                            <Lock className="w-3 h-3 text-amber-400" />
+                            <span>Kata Sandi / Verifikasi</span>
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setLoginTab('status')}
+                            className="text-[10px] text-slate-400 hover:text-amber-400 transition-colors"
+                          >
+                            Lupa status akun?
+                          </button>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            id="input-student-password"
+                            value={studentPassword}
+                            onChange={(e) => setStudentPassword(e.target.value)}
+                            placeholder="Masukkan kata sandi akun..."
+                            className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs tracking-wider font-mono transition-all"
+                          />
+                          <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
+                          >
+                            {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-[11px] text-slate-300">
-                        Halo <strong>{pendingNotice.fullName}</strong>, data Anda telah tersimpan di database. Guru pembina akan mereview akun Anda di Panel Admin sebelum akses belajar terbuka.
-                      </p>
+
+                      {errorMessage && (
+                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          <span>{errorMessage}</span>
+                        </div>
+                      )}
+
                       <button
-                        type="button"
-                        onClick={() => setLoginTab('status')}
-                        className="text-[11px] text-amber-400 font-bold hover:underline block pt-1"
+                        type="submit"
+                        disabled={isLoggingIn}
+                        id="hero-btn-submit-login"
+                        className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] disabled:opacity-50"
                       >
-                        Cek status persetujuan akun →
+                        {isLoggingIn ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Memverifikasi Akun di Database...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="w-3.5 h-3.5" />
+                            <span>Masuk &amp; Buka Silabus 20 Modul</span>
+                          </>
+                        )}
                       </button>
-                    </div>
+
+                      <div className="pt-2 text-center text-xs text-slate-400">
+                        Belum punya akun siswa?{' '}
+                        <button
+                          type="button"
+                          onClick={() => setLoginTab('register')}
+                          className="text-amber-400 hover:underline font-bold"
+                        >
+                          Daftar Siswa Baru Sekarang
+                        </button>
+                      </div>
+                    </form>
                   )}
-
-                  {errorMessage && (
-                    <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                      <span>{errorMessage}</span>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isLoggingIn}
-                    id="hero-btn-submit-login"
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] disabled:opacity-50"
-                  >
-                    {isLoggingIn ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Memverifikasi Akun di Database...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="w-3.5 h-3.5" />
-                        <span>Masuk &amp; Buka Silabus 20 Modul</span>
-                      </>
-                    )}
-                  </button>
-
-                  <div className="pt-2 text-center text-xs text-slate-400">
-                    Belum punya akun siswa?{' '}
-                    <button
-                      type="button"
-                      onClick={() => setLoginTab('register')}
-                      className="text-amber-400 hover:underline font-bold"
-                    >
-                      Daftar Siswa Baru Sekarang
-                    </button>
-                  </div>
-                </form>
+                </>
               )}
 
               {/* TAB 2: DAFTAR SISWA BARU (FORM PENDAFTARAN) */}
