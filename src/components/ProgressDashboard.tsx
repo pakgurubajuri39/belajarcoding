@@ -10,26 +10,45 @@ import {
 } from 'lucide-react';
 import { StudentProgress, UserSession } from '../types';
 import { SYLLABUS_DATA, BADGES_DATA, AVATAR_OPTIONS } from '../data/syllabus';
-import { getRankFromXp, getResumeLevelId } from '../utils/storage';
+import { getRankFromXp, getResumeLevelId, saveSession } from '../utils/storage';
 import { generateStudentProgressPDF } from '../utils/pdfReport';
 import { Leaderboard } from './Leaderboard';
 import { XpProgressionChart } from './XpProgressionChart';
+import { AvatarSelectorModal } from './AvatarSelectorModal';
 
 interface ProgressDashboardProps {
   progress: StudentProgress;
   session: UserSession;
   onSelectLevel: (levelId: number) => void;
   onLogout?: () => void;
+  onUpdateSession?: (newSession: UserSession) => void;
 }
 
 export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
   progress,
   session,
   onSelectLevel,
-  onLogout
+  onLogout,
+  onUpdateSession
 }) => {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [avatarSuccessToast, setAvatarSuccessToast] = useState<string | null>(null);
+
+  const handleSelectAvatar = (newAvatarId: string) => {
+    const selectedObj = AVATAR_OPTIONS.find(a => a.id === newAvatarId);
+    const updatedSession: UserSession = {
+      ...session,
+      avatar: newAvatarId
+    };
+    saveSession(updatedSession);
+    if (onUpdateSession) {
+      onUpdateSession(updatedSession);
+    }
+    setAvatarSuccessToast(`Avatar karakter berhasil diubah menjadi ${selectedObj?.name || 'Karakter Baru'}! ✨`);
+    setTimeout(() => setAvatarSuccessToast(null), 4000);
+  };
 
   const resumeLevelId = getResumeLevelId(progress, session.role);
   const resumeLevelObj = SYLLABUS_DATA.find(l => l.id === resumeLevelId) || SYLLABUS_DATA[0];
@@ -102,6 +121,19 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
   return (
     <div className="space-y-6 pb-12">
       
+      {/* Toast Notification when Avatar or Profile updates */}
+      {avatarSuccessToast && (
+        <div className="fixed top-20 right-4 sm:right-8 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold shadow-2xl border-2 border-amber-400 flex items-center gap-3 animate-in slide-in-from-top-4 duration-300">
+          <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center text-base">
+            ✨
+          </div>
+          <div>
+            <div className="text-amber-300 font-extrabold text-[11px] uppercase tracking-wider">Pembaruan Avatar</div>
+            <div>{avatarSuccessToast}</div>
+          </div>
+        </div>
+      )}
+
       {/* Top Banner Action Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 rounded-3xl shadow-sm">
         <div className="flex items-center gap-3">
@@ -159,9 +191,22 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
           <div className="relative z-10 space-y-6">
             <div className="flex items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-amber-400 to-indigo-600 flex items-center justify-center text-3xl sm:text-4xl shadow-lg shadow-indigo-500/20 flex-shrink-0 border-2 border-white/20">
-                  {avatarObj.emoji}
+                {/* Interactive Student Avatar with Change Trigger */}
+                <div className="relative group">
+                  <button
+                    type="button"
+                    onClick={() => setIsAvatarModalOpen(true)}
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr ${avatarObj.color || 'from-amber-400 to-indigo-600'} flex items-center justify-center text-3xl sm:text-4xl shadow-lg shadow-indigo-500/20 flex-shrink-0 border-2 border-white/30 hover:scale-105 active:scale-95 transition-all cursor-pointer relative group`}
+                    title="Klik untuk memilih atau mengganti karakter avatar kodingmu"
+                    id="btn-change-avatar-icon"
+                  >
+                    <span>{avatarObj.emoji}</span>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center shadow-md border-2 border-slate-900 group-hover:scale-110 group-hover:rotate-12 transition-all" title="Ganti Karakter">
+                      <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
+                    </div>
+                  </button>
                 </div>
+
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h1 className="text-xl sm:text-2xl font-black tracking-tight">{session.studentName}</h1>
@@ -169,9 +214,28 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
                       {rankInfo.title}
                     </span>
                   </div>
+
                   <p className="text-xs sm:text-sm text-slate-300 mt-1">
                     Peringkat Level {rankInfo.level} • {session.role === 'admin' ? 'Akses Instruktur Penuh' : session.role === 'student' ? 'Siswa Aktif DJuragan Coding' : 'Pengguna Uji Coba (Trial)'}
                   </p>
+
+                  {/* Quick Badge & Change Avatar Button */}
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/10 border border-white/15 text-xs text-slate-200">
+                      <span className="text-sm">{avatarObj.emoji}</span>
+                      <span className="font-bold text-amber-300">{avatarObj.name}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsAvatarModalOpen(true)}
+                      className="px-3 py-1 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-sm transition-all transform active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                      id="btn-open-avatar-selector"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Ganti Avatar</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -554,6 +618,15 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
           })}
         </div>
       </div>
+
+      {/* Avatar Selection Modal */}
+      <AvatarSelectorModal
+        isOpen={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+        currentAvatarId={session.avatar || 'bot_neon'}
+        studentName={session.studentName}
+        onSelectAvatar={handleSelectAvatar}
+      />
 
     </div>
   );

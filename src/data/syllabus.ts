@@ -1,4 +1,4 @@
-import { SyllabusLevel, Badge } from '../types';
+import { SyllabusLevel, Badge, AvatarOption } from '../types';
 import { LEVEL_DRIVE_LINKS, getMaterialsForLevel } from './learningMaterials';
 
 const RAW_SYLLABUS_DATA: SyllabusLevel[] = [
@@ -1902,11 +1902,101 @@ export const BADGES_DATA: Badge[] = [
   { id: 'grandmaster', name: 'DJuragan Coding Grandmaster', icon: 'Crown', description: 'Menyelesaikan semua 20 level silabus & meraih 3000+ XP!', category: 'Honor' }
 ];
 
-export const AVATAR_OPTIONS = [
-  { id: 'bot_neon', name: 'Neon AI Bot', emoji: '🤖', color: 'from-cyan-500 to-blue-600' },
-  { id: 'cat_scratch', name: 'Scratch Cat Hero', emoji: '🐱', color: 'from-amber-400 to-orange-600' },
-  { id: 'rocket_coder', name: 'Astro Coder', emoji: '🚀', color: 'from-purple-500 to-indigo-600' },
-  { id: 'wizard_math', name: 'Cyber Wizard', emoji: '🧙‍♂️', color: 'from-emerald-400 to-teal-600' },
-  { id: 'ninja_logic', name: 'Code Ninja', emoji: '🥷', color: 'from-rose-500 to-red-600' },
-  { id: 'dragon_ai', name: 'AI Dragon', emoji: '🐉', color: 'from-fuchsia-500 to-pink-600' }
+export const AVATAR_OPTIONS: AvatarOption[] = [
+  { 
+    id: 'bot_neon', 
+    name: 'Neon AI Bot', 
+    emoji: '🤖', 
+    color: 'from-cyan-500 to-blue-600',
+    tag: 'AI & Machine Learning',
+    description: 'Spesialis kecerdasan buatan, neural network, dan analisis data cerdas.'
+  },
+  { 
+    id: 'cat_scratch', 
+    name: 'Scratch Cat Hero', 
+    emoji: '🐱', 
+    color: 'from-amber-400 to-orange-600',
+    tag: 'Scratch & Algoritma',
+    description: 'Maskot legendaris logika Scratch, event visual, dan broadcast message.'
+  },
+  { 
+    id: 'rocket_coder', 
+    name: 'Astro Coder', 
+    emoji: '🚀', 
+    color: 'from-purple-500 to-indigo-600',
+    tag: 'Cloud & Antariksa',
+    description: 'Penjelajah antariksa kode, deployment cepat, dan komputasi awan.'
+  },
+  { 
+    id: 'wizard_math', 
+    name: 'Cyber Wizard', 
+    emoji: '🧙‍♂️', 
+    color: 'from-emerald-400 to-teal-600',
+    tag: 'Math & Logika',
+    description: 'Pakar variabel, operator matematika, koordinat X-Y, dan fungsi rumus.'
+  },
+  { 
+    id: 'ninja_logic', 
+    name: 'Code Ninja', 
+    emoji: '🥷', 
+    color: 'from-rose-500 to-red-600',
+    tag: 'Bug Hunter & Debugger',
+    description: 'Ahli menyusup kode rahasia, memburu bug, dan optimasi script kilat.'
+  },
+  { 
+    id: 'dragon_ai', 
+    name: 'AI Dragon', 
+    emoji: '🐉', 
+    color: 'from-fuchsia-500 to-pink-600',
+    tag: 'Cyber Defense & Security',
+    description: 'Penjaga firewall, keamanan siber, dan eksekusi komputasi bertenaga.'
+  },
+  { 
+    id: 'game_dino', 
+    name: 'Pixel Dino', 
+    emoji: '🦖', 
+    color: 'from-lime-500 to-emerald-600',
+    tag: 'Game Dev & Physics',
+    description: 'Master game platformer 2D, gravitasi lompat, dan deteksi benturan sprite.'
+  },
+  { 
+    id: 'cyber_fox', 
+    name: 'Cyber Fox', 
+    emoji: '🦊', 
+    color: 'from-orange-500 to-amber-600',
+    tag: 'Logic & Conditional',
+    description: 'Cerdik dalam percabangan If-Then-Else, deteksi sensor, dan timer game.'
+  },
+  { 
+    id: 'algo_owl', 
+    name: 'Quantum Owl', 
+    emoji: '🦉', 
+    color: 'from-blue-600 to-indigo-700',
+    tag: 'Algorithm & Deep Logic',
+    description: 'Arsitek algoritma bijak, perancang flowchart, dan pengurai masalah komputasi.'
+  },
+  { 
+    id: 'mecha_bear', 
+    name: 'Binary Bear', 
+    emoji: '🐻‍❄️', 
+    color: 'from-teal-500 to-cyan-700',
+    tag: 'Loops & Data Structures',
+    description: 'Ksatria perulangan Repeat-Until, list array, dan pengolah database besar.'
+  },
+  { 
+    id: 'pixel_alien', 
+    name: 'Retro Pixel Alien', 
+    emoji: '👾', 
+    color: 'from-violet-600 to-purple-800',
+    tag: 'Arcade & Creative Art',
+    description: 'Pencipta game arcade retro 8-bit, animasi kostum dinamis, dan efek suara synth.'
+  },
+  { 
+    id: 'cyber_super', 
+    name: 'Super Developer', 
+    emoji: '🦸', 
+    color: 'from-sky-500 to-blue-700',
+    tag: 'Clean Code & Fullstack',
+    description: 'Pahlawan koding masa depan, penyusun blok modular rapi, dan kreator karya digital.'
+  }
 ];

@@ -480,6 +480,7 @@ export default function App() {
                 session={session}
                 onSelectLevel={handleSelectLevel}
                 onLogout={handleLogout}
+                onUpdateSession={setSession}
               />
             )}
 

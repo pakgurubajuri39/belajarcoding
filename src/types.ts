@@ -146,6 +146,15 @@ export interface StudentRegistration {
   updatedAt?: string;
 }
 
+export interface AvatarOption {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+  tag?: string;
+  description?: string;
+}
+
 export interface UserSession {
   isAuthenticated: boolean;
   role: UserRole;

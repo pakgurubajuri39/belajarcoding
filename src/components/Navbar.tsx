@@ -198,9 +198,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Profile Menu Trigger Button */}
             <button
-              onClick={onOpenLoginModal}
-              className="p-2 bg-slate-100 dark:bg-slate-900 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-all text-slate-700 dark:text-slate-300 flex items-center gap-1.5"
-              title="Akses & Akun Siswa"
+              onClick={() => {
+                if (session.isAuthenticated) {
+                  setCurrentTab('progress');
+                } else {
+                  onOpenLoginModal();
+                }
+              }}
+              className="p-2 bg-slate-100 dark:bg-slate-900 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-all text-slate-700 dark:text-slate-300 flex items-center gap-1.5 cursor-pointer"
+              title={session.isAuthenticated ? `Profil Siswa: ${session.studentName} (${avatarObj.name}) - Klik untuk buka profil` : "Akses & Akun Siswa"}
             >
               <span className="text-sm">{avatarObj.emoji}</span>
               <KeyRound className="w-3.5 h-3.5 text-slate-400" />
