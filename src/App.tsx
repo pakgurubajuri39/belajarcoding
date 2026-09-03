@@ -25,7 +25,8 @@ import {
   loadSavedTheme,
   saveSavedTheme,
   checkAndAwardBadges,
-  getResumeLevelId
+  getResumeLevelId,
+  recordXpGain
 } from './utils/storage';
 import {
   InAppNotification,
@@ -35,6 +36,7 @@ import {
   addNotification,
   simulateInactivity
 } from './utils/notifications';
+import { syncStudentProgressToFirebase } from './lib/firebase';
 
 export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(loadSavedTheme());
@@ -71,10 +73,25 @@ export default function App() {
     saveSession(session);
   }, [session]);
 
-  // Persist progress
+  // Persist progress and sync to cloud Firestore
   useEffect(() => {
     saveProgress(progress);
-  }, [progress]);
+    if (session.isAuthenticated) {
+      const studentId = session.registrationId || session.email || `student_${session.studentName.replace(/\s+/g, '_').toLowerCase()}`;
+      syncStudentProgressToFirebase(studentId, {
+        fullName: session.studentName,
+        email: session.email,
+        schoolOrClass: session.schoolOrClass,
+        avatar: session.avatar || 'bot_neon',
+        xp: progress.xp,
+        unlockedLevelIds: progress.unlockedLevelIds,
+        completedLevelIds: progress.completedLevelIds,
+        unlockedBadgesCount: progress.unlockedBadges.length
+      }).catch(err => {
+        console.warn('Silent sync error:', err);
+      });
+    }
+  }, [progress, session]);
 
   // Check 2-day inactivity on initial mount
   useEffect(() => {
@@ -283,11 +300,14 @@ export default function App() {
     // Point last studied to next level if valid, else keep current
     const updatedLastStudied = nextLevelId <= 20 ? nextLevelId : levelId;
 
+    // Record XP gain with historical timeline
+    const activityDesc = `Selesai Level #${currentLevel.id}: ${currentLevel.title}`;
+    const withHistory = recordXpGain(progress, xpToAdd, activityDesc);
+
     const updatedRaw: StudentProgress = {
-      ...progress,
+      ...withHistory,
       completedLevelIds: newCompletedList,
       unlockedLevelIds: newUnlockedList,
-      xp: progress.xp + xpToAdd,
       levelScores: {
         ...progress.levelScores,
         [levelId]: Math.max(progress.levelScores[levelId] || 0, scorePercentage)

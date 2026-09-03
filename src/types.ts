@@ -103,6 +103,14 @@ export interface Badge {
   unlockedAt?: string;
 }
 
+export interface XpHistoryItem {
+  date: string;          // ISO string or YYYY-MM-DD
+  label: string;         // Short formatted date e.g. "01 Sep"
+  xpGain: number;        // XP gained in that event/day
+  cumulativeXp: number;  // Running total XP
+  activityTitle: string; // Description e.g. "Menyelesaikan Level #3"
+}
+
 export interface StudentProgress {
   unlockedLevelIds: number[];
   completedLevelIds: number[];
@@ -115,6 +123,7 @@ export interface StudentProgress {
   unlockedBadges: string[];
   lastStudiedLevelId?: number; // Level yang terakhir dibuka / dipelajari siswa (1-20)
   lastStudiedDate?: string;    // Waktu timestamp sesi belajar terakhir
+  xpHistory?: XpHistoryItem[]; // Rekam jejak kronologis perolehan XP
 }
 
 export type RegistrationStatus = 'pending' | 'approved' | 'rejected';
@@ -145,4 +154,18 @@ export interface UserSession {
   email?: string;
   registrationId?: string;
   schoolOrClass?: string;
+}
+
+export interface LeaderboardEntry {
+  id?: string;
+  studentId: string;
+  fullName: string;
+  schoolOrClass?: string;
+  avatar: string;
+  xp: number;
+  completedLevelIds: number[];
+  unlockedBadgesCount?: number;
+  lastUpdated?: string;
+  rank?: number;
+  isCurrentUser?: boolean;
 }

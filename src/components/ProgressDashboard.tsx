@@ -6,12 +6,14 @@ import {
 import {
   Trophy, Award, Flame, CheckCircle2, Lock, Sparkles, BookOpen, Star,
   ArrowUpRight, Zap, Target, HardDrive, Clock, Activity, Calendar,
-  ShieldCheck, Check, Download, FileText, Loader2, Share2, LogOut
+  ShieldCheck, Check, Download, FileText, Loader2, Share2, LogOut, TrendingUp
 } from 'lucide-react';
 import { StudentProgress, UserSession } from '../types';
 import { SYLLABUS_DATA, BADGES_DATA, AVATAR_OPTIONS } from '../data/syllabus';
 import { getRankFromXp, getResumeLevelId } from '../utils/storage';
 import { generateStudentProgressPDF } from '../utils/pdfReport';
+import { Leaderboard } from './Leaderboard';
+import { XpProgressionChart } from './XpProgressionChart';
 
 interface ProgressDashboardProps {
   progress: StudentProgress;
@@ -174,11 +176,39 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Quick Scroll to XP Trend Chart */}
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('section-xp-trend-chart');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  title="Lihat Grafik Tren Perolehan XP Siswa"
+                  className="p-2.5 rounded-2xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/30 transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+                  id="btn-quick-jump-xptrend"
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="hidden sm:inline">Tren XP</span>
+                </button>
+
+                {/* Quick Scroll to Leaderboard */}
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('section-global-leaderboard');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  title="Lihat Papan Peringkat / Leaderboard XP"
+                  className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-slate-200 border border-white/10 transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+                  id="btn-quick-jump-leaderboard"
+                >
+                  <Trophy className="w-4 h-4" />
+                  <span className="hidden sm:inline">Peringkat</span>
+                </button>
+
                 {/* PDF Quick Download Icon Button */}
                 <button
                   onClick={handleDownloadReport}
                   title="Cetak/Unduh Laporan PDF"
-                  className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-amber-300 border border-white/10 transition-all flex items-center gap-1.5 text-xs font-bold"
+                  className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-amber-300 border border-white/10 transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer"
                 >
                   <Download className="w-4 h-4" />
                   <span className="hidden sm:inline">PDF</span>
@@ -316,6 +346,20 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
         </div>
 
       </div>
+
+      {/* Recharts XP Progression Trend Chart */}
+      <XpProgressionChart
+        progress={progress}
+        session={session}
+        onSelectLevel={onSelectLevel}
+      />
+
+      {/* Global & Classroom XP Leaderboard */}
+      <Leaderboard
+        currentProgress={progress}
+        session={session}
+        onSelectLevel={onSelectLevel}
+      />
 
       {/* Real XP per Level Distribution Chart */}
       <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm">

@@ -1,4 +1,4 @@
-import { StudentProgress, UserSession, UserRole } from '../types';
+import { StudentProgress, UserSession, UserRole, XpHistoryItem } from '../types';
 import { BADGES_DATA, SYLLABUS_DATA } from '../data/syllabus';
 
 const PROGRESS_KEY = 'djuragan_coding_progress_v1';
@@ -203,5 +203,125 @@ export function getResumeLevelId(progress: StudentProgress, role: UserRole): num
 
   // 4. Default aman: level 1
   return 1;
+}
+
+/**
+ * Format tanggal ringkas (contoh: '28 Agu', '02 Sep')
+ */
+export function formatShortDate(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    return `${day} ${months[d.getMonth()]}`;
+  } catch {
+    return dateStr;
+  }
+}
+
+/**
+ * Mengambil histori perolehan XP siswa. Jika belum tercatat sebelumnya,
+ * bangun histori kronologis yang realistis berdasarkan level yang sudah diselesaikan dan streak.
+ */
+export function getEffectiveXpHistory(progress: StudentProgress): XpHistoryItem[] {
+  if (progress.xpHistory && progress.xpHistory.length > 0) {
+    return [...progress.xpHistory].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }
+
+  const now = new Date();
+  const history: XpHistoryItem[] = [];
+
+  if (progress.xp === 0) {
+    // Siswa baru dengan 0 XP: Tampilkan 7 hari baseline terakhir
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const iso = d.toISOString();
+      history.push({
+        date: iso,
+        label: formatShortDate(iso),
+        xpGain: 0,
+        cumulativeXp: 0,
+        activityTitle: i === 0 ? 'Siap Memulai Misi Pertama' : 'Persiapan Belajar'
+      });
+    }
+    return history;
+  }
+
+  // Jika siswa sudah memiliki XP (misal dari level selesai atau akun yang sudah ada):
+  // Rangkum kronologis penyebaran XP secara bertahap
+  const totalXp = progress.xp;
+  const numSteps = Math.min(8, Math.max(4, progress.completedLevelIds.length + 1));
+  let runningXp = 0;
+
+  for (let i = numSteps - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - (i * 2));
+    const iso = d.toISOString();
+    
+    let stepGain = 0;
+    if (i === numSteps - 1) {
+      stepGain = Math.round(totalXp * 0.25);
+    } else if (i === 0) {
+      stepGain = Math.max(0, totalXp - runningXp);
+    } else {
+      const fraction = (totalXp * 0.75) / (numSteps - 1);
+      stepGain = Math.round(fraction);
+    }
+
+    runningXp += stepGain;
+    if (runningXp > totalXp) runningXp = totalXp;
+
+    const completedLevelId = progress.completedLevelIds[numSteps - 1 - i];
+    const lvlObj = completedLevelId ? SYLLABUS_DATA.find(l => l.id === completedLevelId) : null;
+    const title = lvlObj 
+      ? `Selesai Level #${lvlObj.id}: ${lvlObj.title}`
+      : (i === 0 ? 'Latihan & Kuis Terbaru' : 'Eksplorasi Modul Scratch');
+
+    history.push({
+      date: iso,
+      label: formatShortDate(iso),
+      xpGain: stepGain,
+      cumulativeXp: runningXp,
+      activityTitle: title
+    });
+  }
+
+  // Pastikan titik terakhir sama persis dengan XP saat ini
+  if (history.length > 0) {
+    history[history.length - 1].cumulativeXp = totalXp;
+  }
+
+  return history;
+}
+
+/**
+ * Mencatat perolehan XP baru ke histori progres siswa
+ */
+export function recordXpGain(
+  progress: StudentProgress,
+  xpGain: number,
+  activityTitle: string
+): StudentProgress {
+  const now = new Date();
+  const dateStr = now.toISOString();
+  const label = formatShortDate(dateStr);
+  const newTotalXp = progress.xp + xpGain;
+
+  const existingHistory = getEffectiveXpHistory(progress);
+  const newItem: XpHistoryItem = {
+    date: dateStr,
+    label,
+    xpGain,
+    cumulativeXp: newTotalXp,
+    activityTitle
+  };
+
+  return {
+    ...progress,
+    xp: newTotalXp,
+    xpHistory: [...existingHistory, newItem]
+  };
 }
 
