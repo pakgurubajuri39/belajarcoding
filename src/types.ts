@@ -105,10 +105,32 @@ export interface StudentProgress {
   lastStudiedDate?: string;    // Waktu timestamp sesi belajar terakhir
 }
 
+export type RegistrationStatus = 'pending' | 'approved' | 'rejected';
+
+export interface StudentRegistration {
+  id: string;
+  fullName: string;
+  email: string;
+  schoolOrClass: string;
+  phone?: string;
+  password?: string;
+  avatar: string;
+  motivation?: string;
+  status: RegistrationStatus;
+  rejectionReason?: string;
+  approvedAt?: string;
+  approvedBy?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface UserSession {
   isAuthenticated: boolean;
   role: UserRole;
   studentName: string;
   avatar: string;
   loginDate: string;
+  email?: string;
+  registrationId?: string;
+  schoolOrClass?: string;
 }

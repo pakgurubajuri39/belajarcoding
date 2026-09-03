@@ -237,6 +237,7 @@ export default function App() {
       avatar: 'bot_neon',
       loginDate: new Date().toISOString()
     };
+    saveSession(defaultSess);
     setSession(defaultSess);
     setCurrentTab('about');
     setSelectedLevelId(null);

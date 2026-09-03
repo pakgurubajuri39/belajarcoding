@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Validasi data registrasi siswa
+    match /student_registrations/{registrationId} {
+      allow read: if true;
+      
+      allow create: if request.resource.data.keys().hasAll(['fullName', 'email', 'schoolOrClass', 'password', 'status', 'createdAt'])
+                    && request.resource.data.fullName is string
+                    && request.resource.data.email is string
+                    && request.resource.data.password is string
+                    && request.resource.data.status in ['pending', 'approved', 'rejected']
+                    && request.resource.data.fullName.size() > 0
+                    && request.resource.data.password.size() >= 3;
+                    
+      allow update: if request.resource.data.status in ['pending', 'approved', 'rejected']
+                    && request.resource.data.fullName is string;
+                    
+      allow delete: if true;
+    }
+    
+    // Validasi data progres belajar siswa
+    match /student_progress/{progressId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['studentId', 'xp'])
+                            && request.resource.data.studentId is string
+                            && request.resource.data.xp is number;
+      allow delete: if true;
+    }
+  }
+}

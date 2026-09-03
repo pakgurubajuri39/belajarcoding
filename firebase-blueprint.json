@@ -1,0 +1,97 @@
+{
+  "entities": {
+    "student_registrations": {
+      "title": "Student Registrations",
+      "description": "Pendaftaran akun siswa yang menunggu review dan persetujuan dari admin/guru pembina sebelum dapat mengakses kurikulum penuh.",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "description": "Nama lengkap siswa"
+        },
+        "email": {
+          "type": "string",
+          "description": "Alamat email siswa atau orang tua sebagai identitas login"
+        },
+        "schoolOrClass": {
+          "type": "string",
+          "description": "Asal sekolah dan tingkatan kelas siswa"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Nomor WhatsApp siswa atau orang tua untuk verifikasi"
+        },
+        "password": {
+          "type": "string",
+          "description": "Kata sandi yang dibuat siswa untuk masuk ke akun"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "ID karakter avatar yang dipilih"
+        },
+        "motivation": {
+          "type": "string",
+          "description": "Alasan atau minat belajar Scratch dan coding"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected"],
+          "description": "Status persetujuan: pending (menunggu review admin), approved (disetujui dapat belajar), rejected (ditolak)"
+        },
+        "rejectionReason": {
+          "type": "string",
+          "description": "Alasan penolakan dari admin bila status rejected"
+        },
+        "approvedAt": {
+          "type": "string",
+          "description": "Timestamp ISO saat disetujui oleh admin"
+        },
+        "approvedBy": {
+          "type": "string",
+          "description": "Nama admin atau instruktur yang menyetujui pendaftaran"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp ISO saat pendaftaran dibuat"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp ISO saat data terakhir diperbarui"
+        }
+      },
+      "required": ["fullName", "email", "schoolOrClass", "password", "status", "createdAt"]
+    },
+    "student_progress": {
+      "title": "Student Learning Progress",
+      "description": "Data progres level, XP, badge, dan kuis siswa yang tersimpan di cloud Firebase.",
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string",
+          "description": "ID referensi pendaftaran siswa"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Nama siswa"
+        },
+        "xp": {
+          "type": "number",
+          "description": "Total XP capaian siswa"
+        },
+        "unlockedLevelIds": {
+          "type": "array",
+          "description": "Daftar level ID yang sudah terbuka"
+        },
+        "completedLevelIds": {
+          "type": "array",
+          "description": "Daftar level ID yang sudah diselesaikan"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "Timestamp ISO pembaruan terakhir progres belajar"
+        }
+      },
+      "required": ["studentId", "xp"]
+    }
+  }
+}

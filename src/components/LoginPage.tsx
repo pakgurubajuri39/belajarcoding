@@ -7,12 +7,16 @@ import {
   Gamepad2, Lightbulb, Play, Layers, Compass, BrainCircuit,
   ChevronDown, ChevronUp, FileText, Rocket, HelpCircle, Clock,
   Shield, Flame, MousePointerClick, Download, CheckSquare, Sparkle,
-  GraduationCap, ExternalLink, ChevronRight, X
+  GraduationCap, ExternalLink, ChevronRight, X, UserCheck, Loader2,
+  Mail, School, Phone
 } from 'lucide-react';
 import { STUDENT_PASSCODE, ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
-import { UserSession, SyllabusLevel } from '../types';
+import { UserSession, SyllabusLevel, StudentRegistration } from '../types';
 import { AVATAR_OPTIONS, SYLLABUS_DATA, BADGES_DATA } from '../data/syllabus';
 import { BrandLogo } from './BrandLogo';
+import { StudentRegistrationForm } from './StudentRegistrationForm';
+import { CheckRegistrationStatus } from './CheckRegistrationStatus';
+import { loginStudentWithFirebase } from '../lib/firebase';
 
 interface LoginPageProps {
   onLoginSuccess: (session: UserSession) => void;
@@ -31,17 +35,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const resumeLevelObj = SYLLABUS_DATA.find(l => l.id === resumeLevelId) || SYLLABUS_DATA[0];
   const hasPreviousActivity = savedProgress.completedLevelIds.length > 0 || (savedProgress.lastStudiedLevelId && savedProgress.lastStudiedLevelId > 1) || savedProgress.xp > 0;
 
-  // Login Form States
-  const [loginTab, setLoginTab] = useState<'passcode' | 'trial'>('passcode');
+  // Login Form States: 'login' | 'register' | 'status' | 'trial'
+  const [loginTab, setLoginTab] = useState<'login' | 'register' | 'status' | 'trial'>('login');
+  const [emailOrCode, setEmailOrCode] = useState('');
+  const [studentPassword, setStudentPassword] = useState('');
   const [studentName, setStudentName] = useState(
     savedSession.studentName && savedSession.studentName !== 'Siswa Tamu' && savedSession.studentName !== 'Siswa Uji Coba (Trial)'
       ? savedSession.studentName
       : ''
   );
-  const [accessCode, setAccessCode] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(savedSession.avatar || AVATAR_OPTIONS[0].id);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [pendingNotice, setPendingNotice] = useState<StudentRegistration | null>(null);
 
   // Curriculum Stage Filter State
   const [selectedStage, setSelectedStage] = useState<number | 'all'>('all');
@@ -50,14 +57,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  const handlePasscodeSubmit = (e: React.FormEvent) => {
+  const handleMainLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    setPendingNotice(null);
 
-    const trimmedCode = accessCode.trim();
-    const finalName = studentName.trim() || 'Siswa Juara Coding';
+    const trimmedInput = emailOrCode.trim();
+    const trimmedPass = studentPassword.trim();
 
-    if (trimmedCode === ADMIN_PASSCODE) {
+    if (!trimmedInput) {
+      setErrorMessage('Mohon masukkan email terdaftar atau kode akses.');
+      return;
+    }
+
+    // 1. Direct Passcode Master Admin Check
+    if (trimmedInput === ADMIN_PASSCODE || trimmedPass === ADMIN_PASSCODE) {
       onLoginSuccess({
         isAuthenticated: true,
         role: 'admin',
@@ -65,16 +79,47 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         avatar: selectedAvatar,
         loginDate: new Date().toISOString()
       });
-    } else if (trimmedCode === STUDENT_PASSCODE) {
+      return;
+    }
+
+    // 2. Direct Passcode Master Student Demo Check
+    if (trimmedInput === STUDENT_PASSCODE || trimmedPass === STUDENT_PASSCODE) {
       onLoginSuccess({
         isAuthenticated: true,
         role: 'student',
-        studentName: finalName,
+        studentName: studentName.trim() || 'Siswa Juara Coding',
         avatar: selectedAvatar,
         loginDate: new Date().toISOString()
       });
-    } else {
-      setErrorMessage('Kode akses tidak valid. Silakan periksa kembali atau minta kode akses kepada guru/instruktur pembina.');
+      return;
+    }
+
+    // 3. Email-based Firebase Registered Student Login
+    setIsLoggingIn(true);
+    try {
+      const result = await loginStudentWithFirebase(trimmedInput, trimmedPass);
+      if (result.success && result.registration) {
+        // Status is approved! Student can immediately start learning
+        onLoginSuccess({
+          isAuthenticated: true,
+          role: 'student',
+          studentName: result.registration.fullName,
+          avatar: result.registration.avatar || selectedAvatar,
+          loginDate: new Date().toISOString(),
+          email: result.registration.email,
+          registrationId: result.registration.id,
+          schoolOrClass: result.registration.schoolOrClass
+        });
+      } else {
+        if (result.status === 'pending' && result.registration) {
+          setPendingNotice(result.registration);
+        }
+        setErrorMessage(result.message || 'Email atau kata sandi tidak cocok.');
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Terjadi kesalahan sistem saat mencoba masuk.');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -235,13 +280,27 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           </nav>
 
           {/* Action CTAs & Theme Switcher */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => scrollToSection('sec-login-portal')}
-              className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md shadow-amber-400/20 transition-all flex items-center gap-1.5"
+              onClick={() => {
+                setLoginTab('register');
+                scrollToSection('sec-login-portal');
+              }}
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black text-xs shadow-md shadow-amber-400/20 transition-all flex items-center gap-1.5"
             >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Portal Masuk</span>
+              <UserCheck className="w-3.5 h-3.5" />
+              <span>Daftar Siswa</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setLoginTab('login');
+                scrollToSection('sec-login-portal');
+              }}
+              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-xs transition-all flex items-center gap-1.5"
+            >
+              <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+              <span>Masuk</span>
             </button>
 
             <button
@@ -302,19 +361,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/80">
                 <CheckCircle2 className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                <span><strong>Sertifikat Digital:</strong> Transkrip PDF Resmi</span>
+                <span><strong>Persetujuan Guru:</strong> Backend Firebase Resmi</span>
               </div>
             </div>
 
             {/* Quick Action Buttons */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
               <button
-                onClick={() => scrollToSection('sec-login-portal')}
+                onClick={() => {
+                  setLoginTab('register');
+                  scrollToSection('sec-login-portal');
+                }}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-400/20 flex items-center justify-center gap-2 transition-all transform active:scale-95"
               >
-                <KeyRound className="w-4 h-4" />
-                <span>Masuk dengan Kode Akses Siswa</span>
+                <UserCheck className="w-4 h-4" />
+                <span>Daftar Siswa Baru</span>
                 <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setLoginTab('login');
+                  scrollToSection('sec-login-portal');
+                }}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all"
+              >
+                <KeyRound className="w-4 h-4 text-amber-400" />
+                <span>Masuk ke Akun</span>
               </button>
 
               <button
@@ -322,49 +395,83 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   setLoginTab('trial');
                   scrollToSection('sec-login-portal');
                 }}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all"
+                className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 text-cyan-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
               >
-                <Code2 className="w-4 h-4 text-cyan-400" />
-                <span>Coba Trial Gratis (Modul 1)</span>
+                <Code2 className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Trial Modul 1</span>
               </button>
             </div>
 
           </div>
 
-          {/* Right Column: Interactive Login Portal Widget (Direct Fast Entrance) */}
+          {/* Right Column: Interactive Login Portal Widget */}
           <div className="lg:col-span-5" id="sec-login-portal">
-            <div className="relative rounded-3xl bg-slate-850 bg-slate-900/95 border border-slate-700/80 shadow-2xl p-6 sm:p-8 backdrop-blur-xl space-y-5">
+            <div className="relative rounded-3xl bg-slate-900/95 border border-slate-700/80 shadow-2xl p-5 sm:p-7 backdrop-blur-xl space-y-4">
               
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div>
                   <h3 className="text-base font-black text-white flex items-center gap-2">
                     <Lock className="w-4 h-4 text-amber-400" />
                     <span>Portal Akses Pembelajaran</span>
                   </h3>
-                  <p className="text-xs text-slate-400">Masuk untuk membuka seluruh level &amp; studio</p>
+                  <p className="text-[11px] text-slate-400">Pendaftaran siswa, review admin, &amp; akses belajar</p>
                 </div>
                 <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
-                  Sistem Aktif
+                  Firebase Aktif
                 </span>
               </div>
 
-              {/* Login Tabs */}
-              <div className="flex p-1 rounded-2xl bg-slate-800/90 border border-slate-700/80">
+              {/* Login Navigation Tabs */}
+              <div className="grid grid-cols-4 p-1 rounded-2xl bg-slate-800/90 border border-slate-700/80 gap-1 text-center">
                 <button
                   type="button"
-                  id="portal-tab-passcode"
+                  id="portal-tab-login"
                   onClick={() => {
-                    setLoginTab('passcode');
+                    setLoginTab('login');
                     setErrorMessage('');
                   }}
-                  className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-                    loginTab === 'passcode'
+                  className={`py-2 px-1 text-[11px] font-bold rounded-xl transition-all flex flex-col items-center justify-center gap-1 ${
+                    loginTab === 'login'
                       ? 'bg-amber-400 text-slate-950 font-black shadow-md shadow-amber-400/20'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   <KeyRound className="w-3.5 h-3.5" />
-                  <span>Kode Akses Penuh</span>
+                  <span>Masuk</span>
+                </button>
+
+                <button
+                  type="button"
+                  id="portal-tab-register"
+                  onClick={() => {
+                    setLoginTab('register');
+                    setErrorMessage('');
+                  }}
+                  className={`py-2 px-1 text-[11px] font-bold rounded-xl transition-all flex flex-col items-center justify-center gap-1 relative ${
+                    loginTab === 'register'
+                      ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-slate-950 font-black shadow-md shadow-amber-400/20'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <UserCheck className="w-3.5 h-3.5" />
+                  <span>Daftar</span>
+                </button>
+
+                <button
+                  type="button"
+                  id="portal-tab-status"
+                  onClick={() => {
+                    setLoginTab('status');
+                    setErrorMessage('');
+                  }}
+                  className={`py-2 px-1 text-[11px] font-bold rounded-xl transition-all flex flex-col items-center justify-center gap-1 ${
+                    loginTab === 'status'
+                      ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-600/20'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Status</span>
                 </button>
 
                 <button
@@ -374,87 +481,77 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     setLoginTab('trial');
                     setErrorMessage('');
                   }}
-                  className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                  className={`py-2 px-1 text-[11px] font-bold rounded-xl transition-all flex flex-col items-center justify-center gap-1 ${
                     loginTab === 'trial'
                       ? 'bg-cyan-500 text-slate-950 font-black shadow-md shadow-cyan-500/20'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Trial Modul 1</span>
+                  <Code2 className="w-3.5 h-3.5" />
+                  <span>Trial</span>
                 </button>
               </div>
 
-              {/* TAB 1: PASSCODE LOGIN */}
-              {loginTab === 'passcode' && (
-                <form onSubmit={handlePasscodeSubmit} className="space-y-4">
+              {/* TAB 1: MASUK (LOGIN) */}
+              {loginTab === 'login' && (
+                <form onSubmit={handleMainLoginSubmit} className="space-y-3.5">
                   {hasPreviousActivity && (
                     <div className="p-3 rounded-2xl bg-indigo-950/70 border border-indigo-500/40 flex items-start gap-2.5 text-xs text-indigo-200">
                       <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                       <div>
                         <span className="font-bold text-white block">Sesi Belajar Tersimpan</span>
                         <span className="text-[11px] text-slate-300">
-                          Masuk untuk otomatis melanjutkan di <strong>Level #{resumeLevelId}: {resumeLevelObj.title}</strong> ({savedProgress.xp} XP).
+                          Lanjutkan di <strong>Level #{resumeLevelId}: {resumeLevelObj.title}</strong> ({savedProgress.xp} XP).
                         </span>
                       </div>
                     </div>
                   )}
 
+                  {/* Input Email / Kode Akses */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                      Nama Siswa / Pengguna
-                    </label>
-                    <input
-                      type="text"
-                      id="hero-input-student-name"
-                      value={studentName}
-                      onChange={(e) => setStudentName(e.target.value)}
-                      placeholder="Contoh: Muhammad Budi / Alisha"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs transition-all"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                      Pilih Avatar Karakter
-                    </label>
-                    <div className="grid grid-cols-6 gap-1.5">
-                      {AVATAR_OPTIONS.map((av) => (
-                        <button
-                          key={av.id}
-                          type="button"
-                          onClick={() => setSelectedAvatar(av.id)}
-                          className={`p-2 rounded-xl border text-base flex flex-col items-center justify-center transition-all ${
-                            selectedAvatar === av.id
-                              ? 'border-amber-400 bg-amber-400/20 scale-105 shadow-sm'
-                              : 'border-slate-800 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300'
-                          }`}
-                          title={av.name}
-                        >
-                          <span>{av.emoji}</span>
-                        </button>
-                      ))}
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Email Siswa / Kode Akses
+                      </label>
+                      <span className="text-[10px] text-amber-400 font-semibold">Firebase / Passcode</span>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        value={emailOrCode}
+                        onChange={(e) => setEmailOrCode(e.target.value)}
+                        placeholder="Contoh: nama@email.com atau djuragan39"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs font-mono transition-all"
+                      />
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     </div>
                   </div>
 
+                  {/* Input Kata Sandi */}
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center justify-between mb-1">
                       <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1">
                         <Lock className="w-3 h-3 text-amber-400" />
-                        <span>Kode Akses Rahasia</span>
+                        <span>Kata Sandi / Verifikasi</span>
                       </label>
-                      <span className="text-[10px] text-slate-400">Dari Guru / Instruktur</span>
+                      <button
+                        type="button"
+                        onClick={() => setLoginTab('status')}
+                        className="text-[10px] text-slate-400 hover:text-amber-400 transition-colors"
+                      >
+                        Lupa status akun?
+                      </button>
                     </div>
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
-                        id="hero-input-passcode"
-                        value={accessCode}
-                        onChange={(e) => setAccessCode(e.target.value)}
-                        placeholder="Ketik kode akses..."
-                        required
-                        className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs tracking-wider font-mono transition-all"
+                        value={studentPassword}
+                        onChange={(e) => setStudentPassword(e.target.value)}
+                        placeholder="Masukkan kata sandi akun..."
+                        className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 text-xs tracking-wider font-mono transition-all"
                       />
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
@@ -465,6 +562,26 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     </div>
                   </div>
 
+                  {/* Pending Notice Banner if student tried logging in before approval */}
+                  {pendingNotice && (
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs space-y-1.5 animate-fadeIn">
+                      <div className="flex items-center gap-1.5 font-bold">
+                        <Clock className="w-4 h-4 text-amber-400 animate-pulse" />
+                        <span>Pendaftaran Masih Menunggu Persetujuan Admin</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300">
+                        Halo <strong>{pendingNotice.fullName}</strong>, data Anda telah tersimpan di Firebase. Guru pembina akan mereview akun Anda di Panel Admin sebelum akses belajar terbuka.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setLoginTab('status')}
+                        className="text-[11px] text-amber-400 font-bold hover:underline block pt-1"
+                      >
+                        Cek status persetujuan akun →
+                      </button>
+                    </div>
+                  )}
+
                   {errorMessage && (
                     <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2">
                       <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
@@ -474,16 +591,56 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
                   <button
                     type="submit"
+                    disabled={isLoggingIn}
                     id="hero-btn-submit-login"
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all transform active:scale-[0.98]"
+                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] disabled:opacity-50"
                   >
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>Masuk &amp; Buka Silabus 20 Modul</span>
+                    {isLoggingIn ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Memverifikasi Akun di Firebase...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>Masuk &amp; Buka Silabus 20 Modul</span>
+                      </>
+                    )}
                   </button>
+
+                  <div className="pt-2 text-center text-xs text-slate-400">
+                    Belum punya akun siswa?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setLoginTab('register')}
+                      className="text-amber-400 hover:underline font-bold"
+                    >
+                      Daftar Siswa Baru Sekarang
+                    </button>
+                  </div>
                 </form>
               )}
 
-              {/* TAB 2: TRIAL */}
+              {/* TAB 2: DAFTAR SISWA BARU (FORM PENDAFTARAN) */}
+              {loginTab === 'register' && (
+                <StudentRegistrationForm
+                  onRegisteredSuccess={() => {
+                    // Registration recorded in Firebase
+                  }}
+                  onSwitchToLogin={() => setLoginTab('login')}
+                  onSwitchToStatusCheck={() => setLoginTab('status')}
+                />
+              )}
+
+              {/* TAB 3: CEK STATUS PERSETUJUAN */}
+              {loginTab === 'status' && (
+                <CheckRegistrationStatus
+                  onSwitchToLogin={() => setLoginTab('login')}
+                  onSwitchToRegister={() => setLoginTab('register')}
+                />
+              )}
+
+              {/* TAB 4: TRIAL GRATIS MODUL 1 */}
               {loginTab === 'trial' && (
                 <form onSubmit={handleTrialSubmit} className="space-y-4">
                   <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-left">
@@ -544,7 +701,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
               <div className="pt-2 text-center text-[10px] text-slate-400 flex items-center justify-center gap-1.5 border-t border-slate-800">
                 <Laptop className="w-3 h-3 text-cyan-400" />
-                <span>Penyimpanan lokal di peramban — aman, privat &amp; ramah anak.</span>
+                <span>Didukung Backend Firebase Firestore &amp; Penyimpanan Terenkripsi.</span>
               </div>
 
             </div>

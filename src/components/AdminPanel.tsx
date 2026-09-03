@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Shield, Unlock, Lock, RefreshCw, KeyRound, CheckCircle2, Download, Upload, Award, BookOpen, AlertTriangle, UserCheck, Sparkles, LogOut } from 'lucide-react';
+import { Shield, Unlock, Lock, RefreshCw, KeyRound, CheckCircle2, Download, Upload, Award, BookOpen, AlertTriangle, UserCheck, Sparkles, LogOut, Users } from 'lucide-react';
 import { StudentProgress, UserSession } from '../types';
 import { SYLLABUS_DATA } from '../data/syllabus';
 import { clearAllLocalData, saveProgress } from '../utils/storage';
+import { AdminStudentApproval } from './AdminStudentApproval';
 
 interface AdminPanelProps {
   progress: StudentProgress;
@@ -19,7 +20,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   onUpdateSession,
   onLogout
 }) => {
-  const [activeTab, setActiveTab] = useState<'control' | 'answers' | 'data'>('control');
+  const [activeTab, setActiveTab] = useState<'approval' | 'control' | 'answers' | 'data'>('approval');
   const [successMessage, setSuccessMessage] = useState('');
 
   const showNotification = (msg: string) => {
@@ -155,43 +156,63 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       </div>
 
       {/* Admin Navigation Tabs */}
-      <div className="flex p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+      <div className="flex flex-wrap p-1 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 gap-1">
+        <button
+          onClick={() => setActiveTab('approval')}
+          className={`flex-1 min-w-[140px] py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+            activeTab === 'approval'
+              ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <UserCheck className="w-4 h-4" />
+          <span>Persetujuan Siswa (Review &amp; Approve)</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('control')}
-          className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 min-w-[140px] py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
             activeTab === 'control'
               ? 'bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <Unlock className="w-4 h-4" />
-          <span>Kontrol Akses & Kunci Level</span>
+          <span>Kontrol Akses Level</span>
         </button>
 
         <button
           onClick={() => setActiveTab('answers')}
-          className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 min-w-[140px] py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
             activeTab === 'answers'
               ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <BookOpen className="w-4 h-4" />
-          <span>Kunci Jawaban & Panduan Guru</span>
+          <span>Kunci Jawaban</span>
         </button>
 
         <button
           onClick={() => setActiveTab('data')}
-          className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+          className={`flex-1 min-w-[140px] py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
             activeTab === 'data'
               ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <Download className="w-4 h-4" />
-          <span>Cadangkan & Pulihkan Data</span>
+          <span>Cadangkan Data</span>
         </button>
       </div>
+
+      {/* TAB 0: Student Approvals (Firebase Backend) */}
+      {activeTab === 'approval' && (
+        <AdminStudentApproval
+          adminName={session.studentName || 'Pak Guru Bajuri (Admin)'}
+          onNotification={showNotification}
+        />
+      )}
 
       {/* TAB 1: Level Controls */}
       {activeTab === 'control' && (
