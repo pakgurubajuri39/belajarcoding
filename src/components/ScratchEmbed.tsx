@@ -37,6 +37,13 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
   const [stageLayout, setStageLayout] = useState<'standard' | 'small' | 'large'>('standard');
   const [isMaximized, setIsMaximized] = useState(false);
   const [isExtensionsModalOpen, setIsExtensionsModalOpen] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<'editor' | 'stage'>('editor');
+  const [inAppToast, setInAppToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setInAppToast(msg);
+    setTimeout(() => setInAppToast(null), 3000);
+  };
 
   // Sprites & Stage State
   const [sprites, setSprites] = useState<SpriteState[]>(INITIAL_SPRITES);
@@ -619,6 +626,14 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         isMaximized ? 'fixed inset-2 sm:inset-4 z-50 shadow-2xl' : 'w-full h-[680px] ' + className
       }`}
     >
+      {/* In-app toast feedback for safe iFrame compatibility */}
+      {inAppToast && (
+        <div className="absolute top-12 right-4 z-50 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xl border border-amber-400 flex items-center gap-2 animate-bounce">
+          <span>✨</span>
+          <span>{inAppToast}</span>
+        </div>
+      )}
+
       {/* 1. TOP SCRATCH 3.0 HEADER (#4C97FF) */}
       <ScratchHeader
         projectTitle={projectTitle}
@@ -626,14 +641,41 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         isTurboMode={isTurboMode}
         setIsTurboMode={setIsTurboMode}
         onNewProject={handleResetStage}
-        onSaveToComputer={() => alert('Proyek tersimpan dengan sukses!')}
-        onLoadFromComputer={() => alert('Fitur unggah file .sb3 siap!')}
-        onOpenTutorials={() => window.open('https://scratch.mit.edu/ideas', '_blank')}
-        onShareProject={() => alert('Proyek berhasil dibagikan!')}
+        onSaveToComputer={() => showToast('Proyek berhasil disimpan ke perangkat!')}
+        onLoadFromComputer={() => showToast('Fitur unggah file Scratch .sb3 aktif')}
+        onOpenTutorials={() => showToast('Membuka panduan ide proyek Scratch')}
+        onShareProject={() => showToast('Proyek berhasil dibagikan ke kelas!')}
         onLogout={onLogout}
         studentName={studentName}
         isCompact={isCompact || stageLayout === 'small'}
       />
+
+      {/* Mobile-only View Switcher for Compact Screens (HP & Small Tablets) */}
+      <div className="flex md:hidden items-center justify-between px-3 py-1.5 bg-[#E2EDFC] border-b border-[#D0E2FB] text-xs">
+        <span className="text-[11px] font-bold text-slate-700">Tampilan HP:</span>
+        <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-[#D0E2FB]">
+          <button
+            onClick={() => setMobilePanel('editor')}
+            className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all ${
+              mobilePanel === 'editor'
+                ? 'bg-[#4C97FF] text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            🧩 Blok & Kode
+          </button>
+          <button
+            onClick={() => setMobilePanel('stage')}
+            className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all ${
+              mobilePanel === 'stage'
+                ? 'bg-[#FFAB19] text-slate-950 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            🎮 Panggung & Sprite
+          </button>
+        </div>
+      </div>
 
       {/* 2. SUB-HEADER: TABS & GREEN FLAG STAGE CONTROLS */}
       <ScratchTabs
@@ -649,59 +691,66 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         isCompact={isCompact || stageLayout === 'small'}
       />
 
-      {/* 3. MAIN EDITOR BODY */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* 3. MAIN EDITOR BODY - Responsive Split for Mobile, Tablet, PC */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         
-        {/* TAB: CODE (Kode) */}
-        {activeTab === 'code' && (
-          <div className="flex-1 flex overflow-hidden min-w-0">
-            {/* Left Category Rail + Blocks Palette */}
-            <ScratchBlocksPalette
-              activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
-              onAddBlock={handleAddBlockToScript}
-              onDragStartFromPalette={handleDragStartFromPalette}
-              onOpenExtensionsModal={() => setIsExtensionsModalOpen(true)}
-              isCompact={isCompact || stageLayout === 'small'}
+        {/* LEFT / MAIN PANE: CODE OR COSTUMES OR SOUNDS */}
+        <div className={`flex-1 flex overflow-hidden min-w-0 ${
+          mobilePanel === 'stage' ? 'hidden md:flex' : 'flex'
+        }`}>
+          {/* TAB: CODE (Kode) */}
+          {activeTab === 'code' && (
+            <div className="flex-1 flex overflow-hidden min-w-0">
+              {/* Left Category Rail + Blocks Palette */}
+              <ScratchBlocksPalette
+                activeCategory={activeCategory}
+                setActiveCategory={setActiveCategory}
+                onAddBlock={handleAddBlockToScript}
+                onDragStartFromPalette={handleDragStartFromPalette}
+                onOpenExtensionsModal={() => setIsExtensionsModalOpen(true)}
+                isCompact={isCompact || stageLayout === 'small'}
+              />
+
+              {/* Middle Scripts Workspace */}
+              <ScratchWorkspace
+                scriptStack={scriptStack}
+                setScriptStack={setScriptStack}
+                executingBlockId={executingBlockId}
+                onExecuteBlock={executeSingleBlock}
+                onRemoveBlock={(id) => setScriptStack(prev => prev.filter(b => b.id !== id))}
+                onClearScript={() => setScriptStack([])}
+                onUpdateBlockParam={handleUpdateBlockParam}
+                onDragStartFromWorkspace={handleDragStartFromWorkspace}
+                onDragOverWorkspace={handleDragOverWorkspace}
+                onDropOnWorkspace={handleDropOnWorkspace}
+                dragOverIndex={dragOverIndex}
+              />
+            </div>
+          )}
+
+          {/* TAB: COSTUMES (Kostum) */}
+          {activeTab === 'costumes' && (
+            <ScratchCostumesTab
+              selectedSprite={currentSprite}
+              onUpdateSprite={handleUpdateSprite}
             />
+          )}
 
-            {/* Middle Scripts Workspace */}
-            <ScratchWorkspace
-              scriptStack={scriptStack}
-              setScriptStack={setScriptStack}
-              executingBlockId={executingBlockId}
-              onExecuteBlock={executeSingleBlock}
-              onRemoveBlock={(id) => setScriptStack(prev => prev.filter(b => b.id !== id))}
-              onClearScript={() => setScriptStack([])}
-              onUpdateBlockParam={handleUpdateBlockParam}
-              onDragStartFromWorkspace={handleDragStartFromWorkspace}
-              onDragOverWorkspace={handleDragOverWorkspace}
-              onDropOnWorkspace={handleDropOnWorkspace}
-              dragOverIndex={dragOverIndex}
+          {/* TAB: SOUNDS (Suara) */}
+          {activeTab === 'sounds' && (
+            <ScratchSoundsTab
+              onPlaySound={playScratchSound}
             />
-          </div>
-        )}
-
-        {/* TAB: COSTUMES (Kostum) */}
-        {activeTab === 'costumes' && (
-          <ScratchCostumesTab
-            selectedSprite={currentSprite}
-            onUpdateSprite={handleUpdateSprite}
-          />
-        )}
-
-        {/* TAB: SOUNDS (Suara) */}
-        {activeTab === 'sounds' && (
-          <ScratchSoundsTab
-            onPlaySound={playScratchSound}
-          />
-        )}
+          )}
+        </div>
 
         {/* RIGHT PANE: STAGE & SPRITE MANAGEMENT */}
-        <div className={`flex-shrink-0 flex flex-col bg-[#F2F7FE] border-l border-[#D0E2FB] overflow-y-auto custom-scrollbar transition-all duration-200 ${
+        <div className={`flex-col bg-[#F2F7FE] border-l border-[#D0E2FB] overflow-y-auto custom-scrollbar transition-all duration-200 ${
+          mobilePanel === 'editor' ? 'hidden md:flex' : 'flex'
+        } ${
           isCompact || stageLayout === 'small'
-            ? 'w-[260px] sm:w-[300px]'
-            : 'w-[320px] sm:w-[400px]'
+            ? 'w-full md:w-[260px] lg:w-[300px]'
+            : 'w-full md:w-[320px] lg:w-[400px]'
         }`}>
           {/* Top Stage */}
           <div className="p-2 bg-[#E9F1FC] border-b border-[#D0E2FB] flex items-center justify-center">
@@ -740,7 +789,7 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
         isOpen={isExtensionsModalOpen}
         onClose={() => setIsExtensionsModalOpen(false)}
         onSelectExtension={(extId) => {
-          alert(`Ekstensi ${extId} berhasil dimuat!`);
+          showToast(`Ekstensi ${extId} berhasil dimuat!`);
         }}
       />
     </div>

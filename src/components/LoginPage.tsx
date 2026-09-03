@@ -10,7 +10,7 @@ import {
   GraduationCap, ExternalLink, ChevronRight, X, UserCheck, Loader2,
   Mail, School, Phone
 } from 'lucide-react';
-import { ADMIN_PASSCODE, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
+import { ADMIN_PASSCODE, isValidAdminPasscode, loadProgress, loadSession, getResumeLevelId } from '../utils/storage';
 import { UserSession, SyllabusLevel, StudentRegistration } from '../types';
 import { AVATAR_OPTIONS, SYLLABUS_DATA, BADGES_DATA } from '../data/syllabus';
 import { BrandLogo } from './BrandLogo';
@@ -74,12 +74,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       return;
     }
 
-    // 1. Direct Passcode Master Admin Check
-    if (trimmedInput === ADMIN_PASSCODE || trimmedPass === ADMIN_PASSCODE) {
+    // 1. Direct Passcode Master Admin Check (guruai39 / bajuri39)
+    if (isValidAdminPasscode(trimmedInput) || isValidAdminPasscode(trimmedPass) || trimmedInput === ADMIN_PASSCODE || trimmedPass === ADMIN_PASSCODE) {
       onLoginSuccess({
         isAuthenticated: true,
         role: 'admin',
-        studentName: studentName.trim() || 'Pak Guru Bajuri (Admin)',
+        studentName: studentName.trim() || 'Pak GuruAI (Admin)',
         avatar: selectedAvatar,
         loginDate: new Date().toISOString()
       });
@@ -1037,7 +1037,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
               <h3 className="text-lg font-bold text-white">Pembina &amp; Kurator</h3>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Dikurasi langsung oleh <strong>Pak Guru Bajuri</strong> beserta tim pengembang teknologi edukasi berpengalaman dalam mendampingi ratusan siswa sekolah dasar dan menengah menguasai logika algoritma secara sistematis.
+                Dikurasi langsung oleh <strong>Pak GuruAI</strong> beserta tim pengembang teknologi edukasi berpengalaman dalam mendampingi ratusan siswa sekolah dasar dan menengah menguasai logika algoritma secara sistematis.
               </p>
             </div>
 
@@ -1470,7 +1470,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         <div className="flex items-center justify-center gap-2">
           <BrandLogo size="sm" />
         </div>
-        <p>© {new Date().getFullYear()} DJuragan Coding • Dibina oleh Pak Guru Bajuri • Platform Edukasi Koding &amp; Computational Thinking Berbasis Scratch 3.0</p>
+        <p>© {new Date().getFullYear()} DJuragan Coding • Dibina oleh Pak GuruAI • Platform Edukasi Koding &amp; Computational Thinking Berbasis Scratch 3.0</p>
         <p className="text-[11px] text-slate-500">Mencetak Generasi Cipta Digital Unggul Indonesia</p>
       </footer>
 

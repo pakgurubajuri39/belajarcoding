@@ -47,72 +47,77 @@ export const Navbar: React.FC<NavbarProps> = ({
             <BrandLogo size="md" />
           </div>
 
-          {/* Center: Main Navigation Tabs - Bento Style */}
-          <nav className="hidden md:flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/70 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+          {/* Center: Main Navigation Tabs - Bento Style Responsive for Laptop, Tablet, PC */}
+          <nav className="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-900/70 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 flex-shrink-0">
             <button
               onClick={() => setCurrentTab('about')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 currentTab === 'about'
                   ? 'bg-amber-400 text-slate-950 shadow-sm font-bold'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Tentang DJuragan</span>
+              <span className="hidden xl:inline">Tentang DJuragan</span>
+              <span className="xl:hidden">Tentang</span>
             </button>
 
             <button
               onClick={() => setCurrentTab('syllabus')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 currentTab === 'syllabus'
                   ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Silabus 20 Level</span>
+              <span className="hidden xl:inline">Silabus 20 Level</span>
+              <span className="xl:hidden">Silabus</span>
             </button>
 
             <button
               onClick={() => setCurrentTab('materials')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 currentTab === 'materials'
                   ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm border border-slate-200 dark:border-slate-700 font-bold'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <FolderDown className="w-3.5 h-3.5" />
-              <span>Modul & Materi</span>
+              <span className="hidden xl:inline">Modul & Materi</span>
+              <span className="xl:hidden">Materi</span>
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-400/20 text-amber-600 dark:text-amber-400 font-extrabold">54</span>
             </button>
 
             <button
               onClick={() => setCurrentTab('scratch')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 currentTab === 'scratch'
                   ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Laptop className="w-3.5 h-3.5" />
-              <span>Scratch Studio</span>
+              <span className="hidden xl:inline">Scratch Studio</span>
+              <span className="xl:hidden">Scratch</span>
             </button>
 
             <button
               onClick={() => setCurrentTab('progress')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 currentTab === 'progress'
                   ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>Grafik Progres</span>
+              <span className="hidden xl:inline">Grafik Progres</span>
+              <span className="xl:hidden">Grafik</span>
             </button>
 
             <button
               onClick={() => setCurrentTab('certificate')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 currentTab === 'certificate'
                   ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200 dark:border-slate-700'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -125,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {session.role === 'admin' && (
               <button
                 onClick={() => setCurrentTab('admin')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                   currentTab === 'admin'
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : 'text-indigo-400 hover:text-indigo-300'
@@ -214,12 +219,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile Navigation bar */}
-        <div className="flex md:hidden items-center justify-around py-2 border-t border-slate-200 dark:border-slate-800/80 overflow-x-auto gap-1 text-[11px]">
+        {/* Mobile Navigation bar - Responsive touch bar */}
+        <div className="flex md:hidden items-center justify-start sm:justify-around py-2 border-t border-slate-200 dark:border-slate-800/80 overflow-x-auto gap-1.5 text-[11px] px-2 no-scrollbar">
           <button
             onClick={() => setCurrentTab('about')}
-            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
-              currentTab === 'about' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-600 dark:text-slate-400'
+            className={`px-3 py-1.5 rounded-xl flex items-center gap-1 font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+              currentTab === 'about' ? 'bg-amber-400 text-slate-950 shadow-sm' : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -227,8 +232,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           <button
             onClick={() => setCurrentTab('syllabus')}
-            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
-              currentTab === 'syllabus' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+            className={`px-3 py-1.5 rounded-xl flex items-center gap-1 font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+              currentTab === 'syllabus' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
@@ -236,8 +241,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           <button
             onClick={() => setCurrentTab('materials')}
-            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
-              currentTab === 'materials' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-600 dark:text-slate-400'
+            className={`px-3 py-1.5 rounded-xl flex items-center gap-1 font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+              currentTab === 'materials' ? 'bg-amber-400 text-slate-950 shadow-sm' : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             <FolderDown className="w-3.5 h-3.5" />
@@ -245,8 +250,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           <button
             onClick={() => setCurrentTab('scratch')}
-            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
-              currentTab === 'scratch' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+            className={`px-3 py-1.5 rounded-xl flex items-center gap-1 font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+              currentTab === 'scratch' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             <Laptop className="w-3.5 h-3.5" />
@@ -254,8 +259,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           <button
             onClick={() => setCurrentTab('progress')}
-            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
-              currentTab === 'progress' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+            className={`px-3 py-1.5 rounded-xl flex items-center gap-1 font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+              currentTab === 'progress' ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
@@ -263,8 +268,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           <button
             onClick={() => setCurrentTab('certificate')}
-            className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
-              currentTab === 'certificate' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-600 dark:text-slate-400'
+            className={`px-3 py-1.5 rounded-xl flex items-center gap-1 font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+              currentTab === 'certificate' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             <Award className="w-3.5 h-3.5" />
@@ -273,8 +278,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           {session.role === 'admin' && (
             <button
               onClick={() => setCurrentTab('admin')}
-              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 font-medium ${
-                currentTab === 'admin' ? 'bg-indigo-600 text-white font-bold' : 'text-indigo-400'
+              className={`px-3 py-1.5 rounded-xl flex items-center gap-1 font-bold whitespace-nowrap flex-shrink-0 transition-all ${
+                currentTab === 'admin' ? 'bg-indigo-600 text-white shadow-sm' : 'text-indigo-400'
               }`}
             >
               <Shield className="w-3.5 h-3.5" />
@@ -283,7 +288,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
           <button
             onClick={onLogout}
-            className="px-2 py-1.5 rounded-lg flex items-center gap-1 font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 transition-colors"
+            className="px-2.5 py-1.5 rounded-xl flex items-center gap-1 font-bold whitespace-nowrap flex-shrink-0 text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 transition-colors"
             title="Keluar / Logout Akun"
           >
             <LogOut className="w-3.5 h-3.5" />

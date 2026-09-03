@@ -124,6 +124,7 @@ export interface StudentProgress {
   lastStudiedLevelId?: number; // Level yang terakhir dibuka / dipelajari siswa (1-20)
   lastStudiedDate?: string;    // Waktu timestamp sesi belajar terakhir
   xpHistory?: XpHistoryItem[]; // Rekam jejak kronologis perolehan XP
+  completedMaterialIds?: number[]; // ID materi belajar (1-54) yang ditandai selesai oleh siswa
 }
 
 export type RegistrationStatus = 'pending' | 'approved' | 'rejected';

@@ -112,6 +112,19 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
     onCompleteLevel(level.id, scorePercentage);
   };
 
+  const handleMarkLevelCompletedDirectly = () => {
+    try {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    } catch {
+      // ignore
+    }
+    onCompleteLevel(level.id, 100);
+  };
+
   const handleSaveStudentNote = () => {
     if (onSaveNote) {
       onSaveNote(level.id, noteText);
@@ -198,8 +211,8 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
               {level.summary}
             </p>
 
-            {level.driveMaterialUrl && (
-              <div className="pt-1 flex flex-wrap items-center gap-2">
+            <div className="pt-1 flex flex-wrap items-center gap-2.5">
+              {level.driveMaterialUrl && (
                 <a
                   href={level.driveMaterialUrl}
                   target="_blank"
@@ -210,8 +223,23 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
                   <span>Buka Modul di Google Drive</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
-              </div>
-            )}
+              )}
+
+              {isCompleted ? (
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 font-bold text-xs shadow-sm">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Modul Selesai Dikerjakan ✓</span>
+                </div>
+              ) : (
+                <button
+                  onClick={handleMarkLevelCompletedDirectly}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs shadow-md shadow-emerald-500/25 transition-all transform active:scale-95 cursor-pointer"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Tandai Selesai Mengerjakan (+{level.xpReward} XP)</span>
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex-shrink-0 flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 border border-white/10 text-center min-w-[140px] shadow-inner">

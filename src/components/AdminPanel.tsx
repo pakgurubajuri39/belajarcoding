@@ -209,7 +209,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       {/* TAB 0: Student Approvals (Firebase Backend) */}
       {activeTab === 'approval' && (
         <AdminStudentApproval
-          adminName={session.studentName || 'Pak Guru Bajuri (Admin)'}
+          adminName={session.studentName || 'Pak GuruAI (Admin)'}
           onNotification={showNotification}
         />
       )}
@@ -293,8 +293,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <span className="font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider text-[10px]">
                   Password Admin (Instruktur):
                 </span>
-                <div className="text-base font-mono font-bold text-slate-900 dark:text-white bg-slate-200 dark:bg-slate-950 p-2 rounded-xl border border-slate-300 dark:border-slate-800">
-                  bajuri39
+                <div className="text-base font-mono font-bold text-slate-900 dark:text-white bg-slate-200 dark:bg-slate-950 p-2 rounded-xl border border-slate-300 dark:border-slate-800 flex items-center justify-between">
+                  <span>guruai39</span>
+                  <span className="text-xs font-sans text-slate-500 font-normal">(atau bajuri39)</span>
                 </div>
                 <p className="text-slate-500 dark:text-slate-400">
                   Digunakan oleh instruktur untuk mengontrol materi, kuis, dan persetujuan siswa.

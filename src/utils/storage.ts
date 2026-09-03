@@ -5,7 +5,12 @@ const PROGRESS_KEY = 'djuragan_coding_progress_v1';
 const SESSION_KEY = 'djuragan_coding_session_v1';
 const THEME_KEY = 'djuragan_coding_theme_v1';
 
-export const ADMIN_PASSCODE = 'bajuri39';
+export const ADMIN_PASSCODE = 'guruai39';
+export const VALID_ADMIN_PASSCODES = ['guruai39', 'bajuri39', 'guruai'];
+
+export function isValidAdminPasscode(input: string): boolean {
+  return VALID_ADMIN_PASSCODES.includes(input.trim().toLowerCase());
+}
 
 export const DEFAULT_PROGRESS: StudentProgress = {
   unlockedLevelIds: [1],
@@ -18,7 +23,8 @@ export const DEFAULT_PROGRESS: StudentProgress = {
   notes: {},
   unlockedBadges: [],
   lastStudiedLevelId: 1,
-  lastStudiedDate: new Date().toISOString()
+  lastStudiedDate: new Date().toISOString(),
+  completedMaterialIds: []
 };
 
 export const DEFAULT_SESSION: UserSession = {
@@ -324,4 +330,67 @@ export function recordXpGain(
     xpHistory: [...existingHistory, newItem]
   };
 }
+
+/**
+ * Menentukan apakah materi belajar tertentu terbuka untuk siswa
+ * Aturan:
+ * 1. Admin: SELALU TERBUKA seluruhnya tanpa terkunci (bebas akses)
+ * 2. Siswa:
+ *    - Materi pertama (indeks 0) selalu terbuka
+ *    - Materi ke-N terbuka jika materi ke-(N-1) telah ditandai selesai (di dalam completedMaterialIds)
+ */
+export function isMaterialUnlocked(
+  materialId: number,
+  allMaterialIds: number[],
+  progress: StudentProgress,
+  role: UserRole
+): boolean {
+  if (role === 'admin') return true;
+
+  const currentIndex = allMaterialIds.indexOf(materialId);
+  if (currentIndex <= 0) {
+    return true;
+  }
+
+  const prevMaterialId = allMaterialIds[currentIndex - 1];
+  const completedIds = progress.completedMaterialIds || [];
+  return completedIds.includes(prevMaterialId);
+}
+
+/**
+ * Menandai materi selesai / toggle tanda selesai
+ * Memberikan +50 XP jika baru pertama kali ditandai selesai
+ */
+export function toggleMaterialCompleted(
+  materialId: number,
+  progress: StudentProgress,
+  materialTitle: string = 'Materi Pembelajaran'
+): { updatedProgress: StudentProgress; isNowCompleted: boolean; xpGained: number } {
+  const currentCompleted = progress.completedMaterialIds || [];
+  const isAlreadyCompleted = currentCompleted.includes(materialId);
+
+  if (isAlreadyCompleted) {
+    const nextCompleted = currentCompleted.filter(id => id !== materialId);
+    const updated = {
+      ...progress,
+      completedMaterialIds: nextCompleted
+    };
+    saveProgress(updated);
+    return { updatedProgress: updated, isNowCompleted: false, xpGained: 0 };
+  } else {
+    const xpReward = 50;
+    const nextCompleted = [...currentCompleted, materialId];
+    const withXp = recordXpGain(
+      {
+        ...progress,
+        completedMaterialIds: nextCompleted
+      },
+      xpReward,
+      `Selesai Materi: ${materialTitle}`
+    );
+    saveProgress(withXp);
+    return { updatedProgress: withXp, isNowCompleted: true, xpGained: xpReward };
+  }
+}
+
 

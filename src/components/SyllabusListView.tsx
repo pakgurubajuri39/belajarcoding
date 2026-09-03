@@ -430,18 +430,28 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
 
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {lvl.driveMaterialUrl && (
-              <a
-                href={lvl.driveMaterialUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="px-2.5 py-1.5 rounded-xl bg-amber-400/10 hover:bg-amber-400/20 text-amber-600 dark:text-amber-400 border border-amber-400/30 text-xs font-bold flex items-center gap-1 transition-all"
-                title="Buka Modul Pembelajaran Resmi di Google Drive"
-              >
-                <FolderDown className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Drive</span>
-                <ExternalLink className="w-2.5 h-2.5 opacity-60" />
-              </a>
+              isUnlocked ? (
+                <a
+                  href={lvl.driveMaterialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="px-2.5 py-1.5 rounded-xl bg-amber-400/10 hover:bg-amber-400/20 text-amber-600 dark:text-amber-400 border border-amber-400/30 text-xs font-bold flex items-center gap-1 transition-all"
+                  title="Buka Modul Pembelajaran Resmi di Google Drive"
+                >
+                  <FolderDown className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Drive</span>
+                  <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                </a>
+              ) : (
+                <span
+                  className="px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 text-xs font-medium flex items-center gap-1 opacity-60 cursor-not-allowed"
+                  title="Terkunci: Selesaikan level sebelumnya untuk membuka berkas materi ini"
+                >
+                  <Lock className="w-3 h-3" />
+                  <span className="hidden sm:inline">Drive</span>
+                </span>
+              )
             )}
 
             {isUnlocked ? (

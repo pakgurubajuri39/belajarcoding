@@ -20,7 +20,7 @@ interface AdminStudentApprovalProps {
 }
 
 export const AdminStudentApproval: React.FC<AdminStudentApprovalProps> = ({
-  adminName = 'Pak Guru Bajuri (Admin)',
+  adminName = 'Pak GuruAI (Admin)',
   onNotification
 }) => {
   const [registrations, setRegistrations] = useState<StudentRegistration[]>([]);

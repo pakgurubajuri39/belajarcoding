@@ -444,6 +444,9 @@ export default function App() {
 
             {currentTab === 'materials' && (
               <MaterialsView
+                session={session}
+                progress={progress}
+                onUpdateProgress={(newProgress) => setProgress(newProgress)}
                 onSelectLevel={(levelId) => {
                   setSelectedLevelId(levelId);
                 }}

@@ -262,7 +262,7 @@ export function subscribeToRegistrations(
  */
 export async function approveStudentRegistration(
   registrationId: string,
-  adminName: string = 'Pak Guru Bajuri (Admin)'
+  adminName: string = 'Pak GuruAI (Admin)'
 ): Promise<{ success: boolean; message: string }> {
   try {
     const docRef = doc(db, REGISTRATIONS_COLLECTION, registrationId);
@@ -360,7 +360,7 @@ export async function seedSampleRegistrationsIfEmpty(): Promise<void> {
         motivation: 'Tertarik dengan game dev dan ingin mengikuti kompetisi coding Scratch tingkat kota.',
         status: 'approved',
         approvedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-        approvedBy: 'Pak Guru Bajuri (Admin)',
+        approvedBy: 'Pak GuruAI (Admin)',
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
       }
