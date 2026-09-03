@@ -266,8 +266,8 @@ export default function App() {
   };
 
   const handleSelectLevel = (levelId: number) => {
-    // Check if guest trying to access locked level
-    if (session.role === 'guest' && levelId > 1) {
+    // Check if trial/guest user trying to access locked level
+    if ((session.role === 'guest' || session.role === 'trial') && levelId > 1) {
       setIsLoginModalOpen(true);
       return;
     }
@@ -284,6 +284,7 @@ export default function App() {
     const currentLevel = SYLLABUS_DATA.find(l => l.id === levelId);
     if (!currentLevel) return;
 
+    const isTrial = session.role === 'guest' || session.role === 'trial';
     const isAlreadyCompleted = progress.completedLevelIds.includes(levelId);
     const xpToAdd = isAlreadyCompleted ? Math.round(currentLevel.xpReward * 0.2) : currentLevel.xpReward;
 
@@ -291,14 +292,16 @@ export default function App() {
       ? progress.completedLevelIds
       : [...progress.completedLevelIds, levelId];
 
-    // Unlock next level automatically if not already unlocked
+    // Unlock next level automatically if not already unlocked (strictly Level 1 for trial)
     const nextLevelId = levelId + 1;
-    const newUnlockedList = progress.unlockedLevelIds.includes(nextLevelId) || nextLevelId > 20
-      ? progress.unlockedLevelIds
-      : [...progress.unlockedLevelIds, nextLevelId];
+    const newUnlockedList = isTrial
+      ? [1]
+      : (progress.unlockedLevelIds.includes(nextLevelId) || nextLevelId > 20
+        ? progress.unlockedLevelIds
+        : [...progress.unlockedLevelIds, nextLevelId]);
 
-    // Point last studied to next level if valid, else keep current
-    const updatedLastStudied = nextLevelId <= 20 ? nextLevelId : levelId;
+    // Point last studied to next level if valid and not trial, else keep Level 1
+    const updatedLastStudied = !isTrial && nextLevelId <= 20 ? nextLevelId : 1;
 
     // Record XP gain with historical timeline
     const activityDesc = `Selesai Level #${currentLevel.id}: ${currentLevel.title}`;
@@ -335,7 +338,7 @@ export default function App() {
     if (!selectedLevelId) return;
     const nextId = selectedLevelId + 1;
     if (nextId <= 20) {
-      if (session.role === 'guest' && nextId > 1) {
+      if ((session.role === 'guest' || session.role === 'trial') && nextId > 1) {
         setIsLoginModalOpen(true);
         return;
       }
@@ -411,6 +414,7 @@ export default function App() {
             onPrevLevel={handlePrevLevel}
             onBackToSyllabus={() => setSelectedLevelId(null)}
             onSaveNote={handleSaveNote}
+            onOpenLoginModal={() => setIsLoginModalOpen(true)}
           />
         ) : (
           /* Render Main Tab Views */
@@ -447,6 +451,7 @@ export default function App() {
                 session={session}
                 progress={progress}
                 onUpdateProgress={(newProgress) => setProgress(newProgress)}
+                onOpenLoginModal={() => setIsLoginModalOpen(true)}
                 onSelectLevel={(levelId) => {
                   setSelectedLevelId(levelId);
                 }}

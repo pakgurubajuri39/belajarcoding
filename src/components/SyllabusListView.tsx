@@ -201,22 +201,22 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
       )}
 
       {/* Trial Alert Card Bento (if user is in guest/trial mode) */}
-      {session.role === 'guest' && (
-        <div className="p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/40 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+      {(session.role === 'guest' || session.role === 'trial') && (
+        <div className="p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-amber-500/40 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
               <Sparkles className="w-4 h-4" />
-              <span>Mode Akses Trial (Level 1 Terbuka)</span>
+              <span>Akses Terbatas Akun Trial: Hanya Level 1 & Modul Mengenal Bagian Scratch</span>
             </div>
             <p className="text-xs text-slate-300">
-              Kamu dapat belajar Level 1 gratis. Masukkan kode akses dari admin (instruktur) untuk membuka seluruh 20 Level silabus!
+              Kamu sedang menggunakan akun trial. Hanya <strong>Level 1: Mengenal Bagian Menu Scratch</strong> yang terbuka. Masukkan kode akses siswa resmi untuk membuka Level 2 hingga 20 beserta materi lengkapnya!
             </p>
           </div>
           <button
             onClick={onOpenLoginModal}
-            className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-md flex-shrink-0 transition-all"
+            className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs shadow-md flex-shrink-0 transition-all cursor-pointer"
           >
-            Masukkan Kode Akses Siswa
+            Buka Kunci Level 2-20 (Kode Akses)
           </button>
         </div>
       )}
@@ -340,13 +340,26 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
 
   function renderLevelCard(lvl: SyllabusLevel) {
     const isCompleted = progress.completedLevelIds.includes(lvl.id);
-    const isUnlocked = progress.unlockedLevelIds.includes(lvl.id) || session.role === 'admin' || lvl.id === 1;
+    const isTrial = session.role === 'guest' || session.role === 'trial';
+    
+    // Akun trial HANYA DAPAT TERBUKA LEVEL 1. Seluruh level 2-20 selalu terkunci!
+    const isUnlocked = session.role === 'admin'
+      ? true
+      : isTrial
+      ? lvl.id === 1
+      : (progress.unlockedLevelIds.includes(lvl.id) || lvl.id === 1);
+
     const isCurrentActiveSession = lvl.id === resumeLevelId && !isCompleted && isUnlocked;
 
     return (
       <motion.div
         key={lvl.id}
         whileHover={{ y: isUnlocked ? -2 : 0 }}
+        onClick={() => {
+          if (!isUnlocked && isTrial && onOpenLoginModal) {
+            onOpenLoginModal();
+          }
+        }}
         className={`relative rounded-3xl border p-5 flex flex-col justify-between transition-all ${
           isCurrentActiveSession
             ? 'bg-gradient-to-b from-indigo-50/70 to-white dark:from-indigo-950/40 dark:to-slate-900 border-indigo-500 ring-2 ring-indigo-500/60 shadow-lg shadow-indigo-500/10'
@@ -354,6 +367,8 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
             ? 'bg-white dark:bg-slate-900/90 border-emerald-500/30 hover:border-emerald-500/50 shadow-sm'
             : isUnlocked
             ? 'bg-white dark:bg-slate-900/90 border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 shadow-sm hover:shadow-md'
+            : isTrial
+            ? 'bg-amber-500/[0.03] dark:bg-slate-900/50 border-amber-500/30 dark:border-amber-500/20 hover:border-amber-400 cursor-pointer shadow-xs'
             : 'bg-slate-100/70 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/60 opacity-60'
         }`}
       >
@@ -368,6 +383,8 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
                   ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
                   : isUnlocked
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                  : isTrial
+                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30'
                   : 'bg-slate-200 dark:bg-slate-800 text-slate-400'
               }`}>
                 {String(lvl.id).padStart(2, '0')}
@@ -394,7 +411,14 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
               ) : !isUnlocked ? (
-                <div className="p-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-400" title="Terkunci (Hubungi admin)">
+                <div 
+                  className={`p-1 rounded-full ${
+                    isTrial 
+                      ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30' 
+                      : 'bg-slate-200 dark:bg-slate-800 text-slate-400'
+                  }`} 
+                  title={isTrial ? "Terkunci untuk akun trial. Hanya Level 1 terbuka." : "Terkunci (Hubungi admin)"}
+                >
                   <Lock className="w-4 h-4" />
                 </div>
               ) : null}
@@ -446,7 +470,7 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
               ) : (
                 <span
                   className="px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 text-xs font-medium flex items-center gap-1 opacity-60 cursor-not-allowed"
-                  title="Terkunci: Selesaikan level sebelumnya untuk membuka berkas materi ini"
+                  title={isTrial ? "Terkunci: Akun trial hanya dapat membuka materi Level 1 (Mengenal Bagian Scratch)" : "Terkunci: Selesaikan level sebelumnya untuk membuka berkas materi ini"}
                 >
                   <Lock className="w-3 h-3" />
                   <span className="hidden sm:inline">Drive</span>
@@ -456,7 +480,10 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
 
             {isUnlocked ? (
               <button
-                onClick={() => onSelectLevel(lvl.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectLevel(lvl.id);
+                }}
                 className={`px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer ${
                   isCurrentActiveSession
                     ? 'bg-gradient-to-r from-amber-400 to-indigo-600 hover:from-amber-300 hover:to-indigo-500 text-slate-950 font-black shadow-md shadow-amber-400/20 scale-105'
@@ -469,6 +496,18 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
                   {isCurrentActiveSession ? '▶ Lanjutkan Belajar' : isCompleted ? 'Pelajari Ulang' : 'Mulai Belajar'}
                 </span>
                 <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : isTrial ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onOpenLoginModal) onOpenLoginModal();
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400 border border-amber-400/40 text-amber-700 hover:text-slate-950 dark:text-amber-300 dark:hover:text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                title="Akun trial: Masukkan kode akses siswa resmi untuk membuka Level ini"
+              >
+                <Lock className="w-3 h-3" />
+                <span>Buka Kunci</span>
               </button>
             ) : (
               <button

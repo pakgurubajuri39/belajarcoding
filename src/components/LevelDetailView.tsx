@@ -19,6 +19,7 @@ interface LevelDetailViewProps {
   onPrevLevel: () => void;
   onBackToSyllabus: () => void;
   onSaveNote?: (levelId: number, note: string) => void;
+  onOpenLoginModal?: () => void;
 }
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string; badge: string }> = {
@@ -43,9 +44,11 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
   onNextLevel,
   onPrevLevel,
   onBackToSyllabus,
-  onSaveNote
+  onSaveNote,
+  onOpenLoginModal
 }) => {
   const isCompleted = progress.completedLevelIds.includes(level.id);
+  const isTrial = session.role === 'guest' || session.role === 'trial';
 
   // Active sub-tab: 'mission' | 'scratch' | 'split' | 'quiz'
   const [activeTab, setActiveTab] = useState<'mission' | 'scratch' | 'split' | 'quiz'>('mission');
@@ -71,6 +74,45 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
     setCurrentStepIndex(0);
     setCompletedSteps({});
   }, [level.id, progress.notes]);
+
+  // Jika akun trial mencoba membuka level selain Level 1, tampilkan layar terkunci khusus trial
+  if (isTrial && level.id > 1) {
+    return (
+      <div className="py-16 px-4 max-w-xl mx-auto text-center space-y-6">
+        <div className="w-20 h-20 rounded-3xl bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto shadow-xl border border-amber-500/30 animate-pulse">
+          <Lock className="w-10 h-10" />
+        </div>
+        <div className="space-y-2">
+          <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-400/20 text-amber-600 dark:text-amber-400 border border-amber-400/40 uppercase tracking-wider inline-block">
+            Batas Akses Akun Trial
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+            Level {level.id} Terkunci
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-md mx-auto">
+            Akun uji coba (trial) hanya dapat membuka <strong>Level 1: Mengenal Bagian Menu Scratch</strong>. Untuk melanjutkan ke Level {level.id} hingga Level 20 dan membuka materi resmi lainnya, silakan masukkan kode akses siswa atau daftar sekarang.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <button
+            onClick={onBackToSyllabus}
+            className="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-bold transition-all cursor-pointer"
+          >
+            ← Kembali ke Silabus
+          </button>
+          {onOpenLoginModal && (
+            <button
+              onClick={onOpenLoginModal}
+              className="px-6 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow-lg shadow-amber-400/20 transition-all cursor-pointer flex items-center gap-2"
+            >
+              <Lock className="w-4 h-4" />
+              <span>Buka Akses Siswa Resmi</span>
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const handleToggleStep = (stepNumber: number) => {
     setCompletedSteps(prev => ({
@@ -164,15 +206,27 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
             Modul {level.id} / 20
           </span>
 
-          <button
-            onClick={onNextLevel}
-            disabled={level.id === 20 || (session.role === 'guest' && level.id >= 1)}
-            id="btn-next-level"
-            className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 disabled:opacity-30 text-xs font-bold flex items-center gap-1.5 hover:border-slate-400 transition-all shadow-sm"
-          >
-            <span className="hidden sm:inline">Level {level.id + 1}</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          {isTrial ? (
+            <button
+              onClick={onOpenLoginModal}
+              id="btn-next-level"
+              className="px-3 py-2 rounded-xl bg-amber-400/20 hover:bg-amber-400 border border-amber-400/40 text-amber-700 hover:text-slate-950 dark:text-amber-300 dark:hover:text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+              title="Level 2 terkunci untuk akun trial. Klik untuk memasukkan kode akses siswa resmi."
+            >
+              <Lock className="w-3.5 h-3.5 text-amber-500" />
+              <span className="hidden sm:inline">Buka Level 2</span>
+            </button>
+          ) : (
+            <button
+              onClick={onNextLevel}
+              disabled={level.id === 20}
+              id="btn-next-level"
+              className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 disabled:opacity-30 text-xs font-bold flex items-center gap-1.5 hover:border-slate-400 transition-all shadow-sm cursor-pointer"
+            >
+              <span className="hidden sm:inline">Level {level.id + 1}</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -943,14 +997,24 @@ export const LevelDetailView: React.FC<LevelDetailViewProps> = ({
                       <span>Ulangi Kuis</span>
                     </button>
 
-                    <button
-                      onClick={onNextLevel}
-                      disabled={level.id === 20 || (session.role === 'guest' && level.id >= 1)}
-                      className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
-                    >
-                      <span>Lanjut ke Level {level.id + 1}</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                    {isTrial ? (
+                      <button
+                        onClick={onOpenLoginModal}
+                        className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md shadow-amber-400/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Lock className="w-4 h-4" />
+                        <span>Buka Level 2-20 (Daftar / Masuk Siswa)</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={onNextLevel}
+                        disabled={level.id === 20}
+                        className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <span>Lanjut ke Level {level.id + 1}</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               )}

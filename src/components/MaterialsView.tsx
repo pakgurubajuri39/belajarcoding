@@ -31,6 +31,7 @@ interface MaterialsViewProps {
   progress: StudentProgress;
   onUpdateProgress: (newProgress: StudentProgress) => void;
   onSelectLevel?: (levelId: number) => void;
+  onOpenLoginModal?: () => void;
 }
 
 const CATEGORIES = [
@@ -49,7 +50,8 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
   session,
   progress,
   onUpdateProgress,
-  onSelectLevel
+  onSelectLevel,
+  onOpenLoginModal
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
@@ -58,6 +60,7 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
   const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
 
   const isAdmin = session.role === 'admin';
+  const isTrial = session.role === 'trial' || session.role === 'guest';
   const completedIds = progress.completedMaterialIds || [];
   const completedLevels = progress.completedLevelIds || [];
 
@@ -66,14 +69,19 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
     // 1. Admin SELALU BEBAS AKSES ke seluruh materi tanpa terkunci
     if (isAdmin) return true;
 
-    // 2. Materi pertama selalu terbuka untuk siswa
+    // 2. Akun TRIAL HANYA MEMBUKA materi "Mengenal Bagian Scratch" (ID 1)
+    if (isTrial) {
+      return item.id === 1;
+    }
+
+    // 3. Materi pertama selalu terbuka untuk siswa
     if (index === 0 || item.id === ALL_LEARNING_MATERIALS[0]?.id) return true;
 
-    // 3. Jika materi sebelumnya dalam daftar sudah ditandai selesai
+    // 4. Jika materi sebelumnya dalam daftar sudah ditandai selesai
     const prevItem = ALL_LEARNING_MATERIALS[index - 1];
     if (prevItem && completedIds.includes(prevItem.id)) return true;
 
-    // 4. Jika level terkait sudah diselesaikan siswa dalam silabus
+    // 5. Jika level terkait sudah diselesaikan siswa dalam silabus
     if (item.targetLevelId && completedLevels.includes(item.targetLevelId)) return true;
 
     return false;
@@ -90,6 +98,12 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
         return;
       }
 
+      // Akun trial hanya membuka materi "Mengenal Bagian Menu Scratch" (ID 1)
+      if (isTrial) {
+        map.set(item.id, item.id === 1);
+        return;
+      }
+
       if (index === 0) {
         map.set(item.id, true);
         prevWasCompleted = completedIds.includes(item.id);
@@ -103,7 +117,7 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
     });
 
     return map;
-  }, [isAdmin, completedIds, completedLevels]);
+  }, [isAdmin, isTrial, completedIds, completedLevels]);
 
   const filteredMaterials = useMemo(() => {
     return ALL_LEARNING_MATERIALS.filter((item, index) => {
@@ -142,7 +156,13 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
 
   const handleToggleCompleted = (item: LearningResource, index: number) => {
     const isUnlocked = materialUnlockMap.get(item.id) ?? false;
-    if (!isUnlocked && !isAdmin) return;
+    if (!isUnlocked && !isAdmin) {
+      if (isTrial) {
+        setNotificationMsg("Akun trial hanya dapat membuka materi 'Mengenal Bagian Menu Scratch'. Masukkan kode akses untuk membuka materi lainnya.");
+        if (onOpenLoginModal) onOpenLoginModal();
+      }
+      return;
+    }
 
     const { updatedProgress, isNowCompleted, xpGained } = toggleMaterialCompleted(
       item.id,
@@ -205,6 +225,11 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Mode Instruktur: Bebas Akses Seluruh Materi (Tanpa Terkunci)</span>
               </div>
+            ) : isTrial ? (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-400/20 border border-amber-400/40 text-amber-300">
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span>Akun Trial: Khusus Modul #01 Mengenal Bagian Scratch</span>
+              </div>
             ) : (
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 border border-indigo-500/40 text-indigo-300">
                 <Lock className="w-3 h-3 text-amber-400" />
@@ -220,6 +245,8 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
             {isAdmin 
               ? 'Selamat datang Pak GuruAI (Admin)! Anda memiliki akses penuh tanpa kunci ke seluruh 54 materi kurikulum, lembar kerja, dan video untuk meninjau dan membimbing siswa.' 
+              : isTrial
+              ? 'Anda menggunakan Akun Uji Coba (Trial). Akses materi dibatasi hanya untuk Modul #01: Mengenal Bagian Menu Scratch. Seluruh 53 modul lainnya terkunci untuk Siswa Resmi terdaftar.'
               : 'Materi pembelajaran dibuka secara berjenjang. Selesaikan dan tandai selesai setiap materi untuk membuka modul pembelajaran berikutnya serta raih +50 XP di setiap materi!'}
           </p>
 
@@ -257,12 +284,36 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
             <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
               <span className="text-[10px] uppercase font-bold text-cyan-300 block">Status Akses</span>
               <span className="text-xs sm:text-sm font-black text-cyan-200">
-                {isAdmin ? 'Semua Terbuka' : `${totalMaterials - completedCount} Menanti`}
+                {isAdmin ? 'Semua Terbuka' : isTrial ? '1 Terbuka (53 Trial Locked)' : `${totalMaterials - completedCount} Menanti`}
               </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Trial Alert Notification Banner in Materials */}
+      {isTrial && (
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-amber-500/50 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
+              <Sparkles className="w-4 h-4" />
+              <span>Akses Terbatas Trial: Hanya Modul #01 'Mengenal Bagian Menu Scratch'</span>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
+              Akun uji coba gratis hanya dapat membuka modul <strong>#01: Mengenal Bagian Menu Scratch</strong>. Untuk membuka 53 modul lainnya (Level 2-20, Worksheet, Video Tutorial & AI Studio), silakan masukkan kode akses atau daftar sebagai siswa resmi.
+            </p>
+          </div>
+          {onOpenLoginModal && (
+            <button
+              onClick={onOpenLoginModal}
+              className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md shadow-amber-400/20 flex-shrink-0 transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Buka Seluruh Materi (Kode Akses)</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Filter and Search Bar */}
       <div className="space-y-3 bg-slate-100 dark:bg-slate-900/50 p-3 sm:p-4 rounded-3xl border border-slate-200 dark:border-slate-800">
@@ -472,12 +523,29 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
                 )}
 
                 {/* Locked Guidance Note for Student */}
-                {!isUnlocked && prevItem && (
+                {!isUnlocked && (
                   <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 flex items-start gap-2">
                     <Lock className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-amber-500" />
-                    <span>
-                      Terkunci: Selesaikan dan tandai selesai materi <strong>#{prevItem.id} ({prevItem.title})</strong> untuk membuka modul ini.
-                    </span>
+                    <div className="space-y-1">
+                      <span>
+                        {isTrial
+                          ? 'Terkunci (Akun Trial): Modul ini khusus Siswa Resmi. Akun trial hanya dapat membuka materi Mengenal Bagian Menu Scratch.'
+                          : prevItem
+                          ? `Terkunci: Selesaikan dan tandai selesai materi #${prevItem.id} (${prevItem.title}) untuk membuka modul ini.`
+                          : 'Terkunci: Selesaikan materi sebelumnya terlebih dahulu.'}
+                      </span>
+                      {isTrial && onOpenLoginModal && (
+                        <div>
+                          <button
+                            type="button"
+                            onClick={onOpenLoginModal}
+                            className="font-bold text-indigo-600 dark:text-amber-400 hover:underline cursor-pointer text-[10px]"
+                          >
+                            Masukkan kode akses siswa resmi &rarr;
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -498,7 +566,9 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
                   }`}
                   title={
                     !isUnlocked && !isAdmin
-                      ? 'Materi terkunci. Selesaikan materi sebelumnya terlebih dahulu.'
+                      ? isTrial
+                        ? 'Terkunci untuk akun trial. Akun trial hanya dapat membuka materi Mengenal Bagian Menu Scratch.'
+                        : 'Materi terkunci. Selesaikan materi sebelumnya terlebih dahulu.'
                       : isCompleted
                       ? 'Klik untuk membatalkan tanda selesai jika diperlukan'
                       : 'Tandai selesai untuk membuka materi berikutnya dan dapatkan +50 XP'
@@ -559,6 +629,15 @@ export const MaterialsView: React.FC<MaterialsViewProps> = ({
                       <span>{isVideo ? 'Tonton Video' : 'Buka Materi'}</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
+                  ) : isTrial ? (
+                    <button
+                      onClick={onOpenLoginModal}
+                      className="px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 bg-amber-400/20 hover:bg-amber-400 border border-amber-400/40 text-amber-700 hover:text-slate-950 dark:text-amber-300 dark:hover:text-slate-950 transition-all cursor-pointer shadow-xs"
+                      title="Terkunci untuk akun trial. Masukkan kode akses siswa untuk membuka modul ini."
+                    >
+                      <Lock className="w-3 h-3" />
+                      <span>Buka Kunci</span>
+                    </button>
                   ) : (
                     <button
                       disabled

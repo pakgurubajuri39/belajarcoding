@@ -175,11 +175,19 @@ export function getRankFromXp(xp: number): { rank: string; title: string; level:
 }
 
 /**
+ * Cek apakah role merupakan akun uji coba (trial atau guest)
+ */
+export function isTrialRole(role?: string): boolean {
+  return role === 'guest' || role === 'trial';
+}
+
+/**
  * Menghitung Level ID yang tepat untuk dilanjutkan (Resume) oleh siswa.
  * Memastikan siswa tidak kembali ke awal (Level 1) melainkan melanjutkan dari materi terakhir yang dipelajari.
+ * Akun trial/guest selalu dibatasi hanya pada Level 1.
  */
 export function getResumeLevelId(progress: StudentProgress, role: UserRole): number {
-  if (role === 'guest') return 1;
+  if (role === 'guest' || (role as string) === 'trial') return 1;
 
   // 1. Jika ada catatan level terakhir yang sedang dipelajari dan level tersebut valid & terbuka
   if (
