@@ -5,7 +5,7 @@ import {
   BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Sparkles, HelpCircle,
   Play, Laptop, Award, ArrowRight, Lightbulb, Code2, AlertTriangle, MessageSquare,
   Check, X, Target, Wrench, FileText, CheckSquare, Square, Save, RotateCcw, Share2, Compass,
-  ExternalLink, FolderDown
+  ExternalLink, FolderDown, Lock
 } from 'lucide-react';
 import { SyllabusLevel, StudentProgress, UserSession, BlockLine } from '../types';
 import { ScratchEmbed } from './ScratchEmbed';

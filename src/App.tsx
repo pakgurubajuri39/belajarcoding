@@ -175,6 +175,7 @@ export default function App() {
   };
 
   const handleLoginSuccess = (newSession: UserSession) => {
+    saveSession(newSession);
     setSession(newSession);
     setIsLoginModalOpen(false);
     if (currentTab === 'about') {
@@ -203,6 +204,7 @@ export default function App() {
     updatedProgressState.lastStudiedLevelId = resumeLevelId;
     updatedProgressState.lastStudiedDate = new Date().toISOString();
 
+    saveProgress(updatedProgressState);
     setProgress(updatedProgressState);
     setSelectedLevelId(resumeLevelId);
 
@@ -233,15 +235,19 @@ export default function App() {
       avatar: 'bot_neon',
       loginDate: new Date().toISOString()
     };
+    saveSession(trialSession);
     setSession(trialSession);
-    if (!progress.unlockedLevelIds.includes(1)) {
-      setProgress(prev => ({
-        ...prev,
-        unlockedLevelIds: [1],
-        lastStudiedLevelId: 1,
-        lastStudiedDate: new Date().toISOString()
-      }));
+    setIsLoginModalOpen(false);
+    
+    let updatedProgress = { ...progress };
+    if (!updatedProgress.unlockedLevelIds.includes(1)) {
+      updatedProgress.unlockedLevelIds = [1];
     }
+    updatedProgress.lastStudiedLevelId = 1;
+    updatedProgress.lastStudiedDate = new Date().toISOString();
+    saveProgress(updatedProgress);
+    setProgress(updatedProgress);
+
     setSelectedLevelId(1);
     setCurrentTab('syllabus');
     window.scrollTo({ top: 0, behavior: 'smooth' });
