@@ -473,7 +473,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                       <div className="flex gap-2">
                         <a
                           href={`https://wa.me/6281234567890?text=${encodeURIComponent(
-                            `Halo Admin/Guru Sobat Koding, saya telah mendaftar dengan nama: ${pendingNotice.fullName} (${pendingNotice.email}). Mohon bantuannya untuk persetujuan akun agar saya dapat mulai belajar. Terima kasih!`
+                            `Halo Admin/Guru Sobat Coding, saya telah mendaftar dengan nama: ${pendingNotice.fullName} (${pendingNotice.email}). Mohon bantuannya untuk persetujuan akun agar saya dapat mulai belajar. Terima kasih!`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -514,7 +514,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                               Level #{resumeLevelId}: {resumeLevelObj.title}
                             </h4>
                             <p className="text-[10px] text-slate-300 mt-0.5">
-                              {savedSession.studentName ? `Siswa: ${savedSession.studentName}` : 'Siswa Sobat Koding'} • {savedProgress.xp} XP
+                              {savedSession.studentName ? `Siswa: ${savedSession.studentName}` : 'Siswa Sobat Coding'} • {savedProgress.xp} XP
                             </p>
                           </div>
                         </div>
@@ -645,7 +645,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </>
             )}
 
-            {/* TAB: MARKETING SHOWCASE "TENTANG SOBAT KODING" */}
+            {/* TAB: MARKETING SHOWCASE "TENTANG SOBAT CODING" */}
             {activeTab === 'about' && (
               <div className="space-y-4">
                 {/* Hero Marketing Value Proposition */}
@@ -658,7 +658,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     Ubah Waktu Layar Gadget Menjadi Karya Nyata yang Membanggakan!
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-                    <strong>Sobat Koding</strong> dirancang khusus sebagai kurikulum komprehensif 20 modul visual Scratch 3.0. Kami membekali anak dengan kemampuan <em>Computational Thinking</em>, pemecahan masalah algoritma, logika matematika, pembuatan game interaktif, hingga konsep kecerdasan buatan (AI) sejak usia dini.
+                    <strong>Sobat Coding</strong> dirancang khusus sebagai kurikulum komprehensif 20 modul visual Scratch 3.0. Kami membekali anak dengan kemampuan <em>Computational Thinking</em>, pemecahan masalah algoritma, logika matematika, pembuatan game interaktif, hingga konsep kecerdasan buatan (AI) sejak usia dini.
                   </p>
                 </div>
 
@@ -768,7 +768,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     <span>Mode Uji Coba Gratis (Trial Level 1)</span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    Kamu bisa langsung mencoba belajar <strong>Level 1: Mengenal Bagian Menu Scratch</strong> tanpa kode akses untuk merasakan serunya belajar koding di Sobat Koding!
+                    Kamu bisa langsung mencoba belajar <strong>Level 1: Mengenal Bagian Menu Scratch</strong> tanpa kode akses untuk merasakan serunya belajar koding di Sobat Coding!
                   </p>
                 </div>
 

@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div 
             className="flex items-center gap-3 cursor-pointer flex-shrink-0" 
             onClick={() => setCurrentTab(session.isAuthenticated ? 'syllabus' : 'about')}
-            title="Sobat Koding - Beranda"
+            title="Sobat Coding - Beranda"
           >
             <BrandLogo size="md" />
           </div>
@@ -58,7 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span className="hidden xl:inline">Tentang Sobat Koding</span>
+              <span className="hidden xl:inline">Tentang Sobat Coding</span>
               <span className="xl:hidden">Tentang</span>
             </button>
 

@@ -180,7 +180,7 @@ export async function loginStudentWithFirebase(
       success: true,
       status: 'approved',
       registration: student,
-      message: 'Login berhasil! Selamat belajar di Sobat Koding.'
+      message: 'Login berhasil! Selamat belajar di Sobat Coding.'
     };
   } catch (error: any) {
     console.error('Error loginStudentWithFirebase:', error);

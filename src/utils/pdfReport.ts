@@ -73,7 +73,7 @@ export function generateStudentProgressPDF(progress: StudentProgress, session: U
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text('SOBAT KODING', 14, 14);
+  doc.text('SOBAT CODING', 14, 14);
 
   doc.setFontSize(8.5);
   doc.setFont('helvetica', 'normal');
@@ -244,7 +244,7 @@ export function generateStudentProgressPDF(progress: StudentProgress, session: U
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(148, 163, 184);
   doc.text('Halaman 1 dari 2 | Dilanjutkan pada halaman berikutnya untuk Semester Genap & Lencana Prestasi.', 14, 287);
-  doc.text('Verifikasi Digital: Sobat-Koding-Valid', 145, 287);
+  doc.text('Verifikasi Digital: Sobat-Coding-Valid', 145, 287);
 
   // ==========================================
   // PAGE 2: SEMESTER GENAP, BADGES, & EVALUASI
@@ -260,7 +260,7 @@ export function generateStudentProgressPDF(progress: StudentProgress, session: U
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
-  doc.text('SOBAT KODING - LAPORAN CAPAIAN SEMESTER GENAP & PRESTASI', 14, 10.5);
+  doc.text('SOBAT CODING - LAPORAN CAPAIAN SEMESTER GENAP & PRESTASI', 14, 10.5);
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(203, 213, 225);
@@ -426,7 +426,7 @@ export function generateStudentProgressPDF(progress: StudentProgress, session: U
   doc.setFontSize(7.5);
   doc.setTextColor(51, 65, 85);
   const evaluationNote = completedCount === 20
-    ? 'Siswa telah berhasil menuntaskan seluruh 20 Modul Kurikulum Sobat Koding dengan capaian istimewa, menguasai logika algoritma, pembuatan game, variabel, koordinat, dan dasar kecerdasan buatan Scratch.'
+    ? 'Siswa telah berhasil menuntaskan seluruh 20 Modul Kurikulum Sobat Coding dengan capaian istimewa, menguasai logika algoritma, pembuatan game, variabel, koordinat, dan dasar kecerdasan buatan Scratch.'
     : completedCount >= 10
     ? `Siswa menunjukkan dedikasi yang sangat baik dengan menuntaskan ${completedCount} modul. Terus tingkatkan latihan pembuatan game dan logika komputasional untuk meraih gelar Grandmaster Coder!`
     : `Siswa telah aktif memulai pembelajaran dan meraih ${progress.xp.toLocaleString()} XP. Disarankan untuk rutin berlatih 15 menit per hari agar kemampuan computational thinking berkembang maksimal.`;
@@ -439,7 +439,7 @@ export function generateStudentProgressPDF(progress: StudentProgress, session: U
   doc.setFontSize(7.5);
   doc.setTextColor(71, 85, 105);
   doc.text('Disahkan Oleh:', 142, y + 6.5);
-  doc.text('Instruktur Utama Sobat Koding', 142, y + 11);
+  doc.text('Instruktur Utama Sobat Coding', 142, y + 11);
 
   // Digital Signature Stamp Pill
   doc.setFillColor(238, 242, 255);
@@ -452,7 +452,7 @@ export function generateStudentProgressPDF(progress: StudentProgress, session: U
   doc.setFontSize(6.2);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(99, 102, 241);
-  doc.text('Akademi Sobat Koding', 164, y + 25, { align: 'center' });
+  doc.text('Akademi Sobat Coding', 164, y + 25, { align: 'center' });
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
@@ -463,7 +463,7 @@ export function generateStudentProgressPDF(progress: StudentProgress, session: U
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(148, 163, 184);
-  doc.text('Halaman 2 dari 2 | Dokumen ini adalah laporan progres resmi yang di-generate dari platform Sobat Koding.', 14, 287);
+  doc.text('Halaman 2 dari 2 | Dokumen ini adalah laporan progres resmi yang di-generate dari platform Sobat Coding.', 14, 287);
   doc.text('Copyright by Pak GuruAI', 162, 287);
 
   // Trigger Save / Download

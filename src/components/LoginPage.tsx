@@ -342,8 +342,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
   const faqs = [
     {
-      q: 'Apa itu platform pembelajaran Sobat Koding?',
-      a: 'Sobat Koding adalah platform edukasi interaktif berbasis Scratch 3.0 dan Computational Thinking yang dirancang khusus untuk memfasilitasi anak-anak dan pemula dalam menguasai logika pemrograman secara bertahap, mendalam, dan menyenangkan.'
+      q: 'Apa itu platform pembelajaran Sobat Coding?',
+      a: 'Sobat Coding adalah platform edukasi interaktif berbasis Scratch 3.0 dan Computational Thinking yang dirancang khusus untuk memfasilitasi anak-anak dan pemula dalam menguasai logika pemrograman secara bertahap, mendalam, dan menyenangkan.'
     },
     {
       q: 'Bagaimana kurikulum 20 modul ini dirancang?',
@@ -482,7 +482,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </h1>
 
             <p className="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              Selamat datang di <strong>Sobat Koding</strong> — platform kurikulum koding visual Scratch 3.0 terlengkap, terstruktur, dan interaktif. Membekali anak-anak dengan daya nalar kritis, kreativitas tanpa batas, serta pemecahan masalah algoritma tingkat tinggi sejak usia dini.
+              Selamat datang di <strong>Sobat Coding</strong> — platform kurikulum koding visual Scratch 3.0 terlengkap, terstruktur, dan interaktif. Membekali anak-anak dengan daya nalar kritis, kreativitas tanpa batas, serta pemecahan masalah algoritma tingkat tinggi sejak usia dini.
             </p>
 
             {/* Value Checkpoints Grid */}
@@ -720,7 +720,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                         <div className="flex gap-2">
                           <a
                             href={`https://wa.me/6281234567890?text=${encodeURIComponent(
-                              `Halo Admin/Guru Sobat Koding, saya telah mendaftar dengan nama: ${pendingNotice.fullName} (${pendingNotice.email}). Mohon bantuannya untuk persetujuan akun agar saya dapat mulai belajar. Terima kasih!`
+                              `Halo Admin/Guru Sobat Coding, saya telah mendaftar dengan nama: ${pendingNotice.fullName} (${pendingNotice.email}). Mohon bantuannya untuk persetujuan akun agar saya dapat mulai belajar. Terima kasih!`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -762,7 +762,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                                   Level #{resumeLevelId}: {resumeLevelObj.title}
                                 </h4>
                                 <p className="text-[10px] text-slate-300 mt-0.5">
-                                  {savedSession.studentName ? `Siswa: ${savedSession.studentName}` : 'Siswa Sobat Koding'} • {savedProgress.xp} XP • {savedProgress.completedLevelIds.length}/20 Modul Selesai
+                                  {savedSession.studentName ? `Siswa: ${savedSession.studentName}` : 'Siswa Sobat Coding'} • {savedProgress.xp} XP • {savedProgress.completedLevelIds.length}/20 Modul Selesai
                                 </p>
                               </div>
                             </div>
@@ -976,7 +976,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* 3. SECTION: TENTANG SOBAT KODING (PROFIL & VISI MISI)                      */}
+      {/* 3. SECTION: TENTANG SOBAT CODING (PROFIL & VISI MISI)                      */}
       {/* ========================================================================= */}
       <section id="sec-about" className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full border-t border-slate-800">
         <div className="space-y-12">
@@ -987,10 +987,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               <span>Profil Lembaga &amp; Visi Edukasi</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-              Mengenal Lebih Dekat <span className="text-amber-400">Sobat Koding</span>
+              Mengenal Lebih Dekat <span className="text-amber-400">Sobat Coding</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Sobat Koding lahir dari komitmen mendalam untuk menghadirkan pendidikan teknologi yang bermakna, menyenangkan, dan berorientasi pada masa depan anak-anak Indonesia.
+              Sobat Coding lahir dari komitmen mendalam untuk menghadirkan pendidikan teknologi yang bermakna, menyenangkan, dan berorientasi pada masa depan anak-anak Indonesia.
             </p>
           </div>
 
@@ -1316,7 +1316,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               <span>Standar Keunggulan Pembelajaran</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-              Mengapa Memilih Sobat Koding?
+              Mengapa Memilih Sobat Coding?
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Bandingkan fitur komprehensif kami dengan metode pembelajaran konvensional (video tutorial acak atau buku statis):
@@ -1330,7 +1330,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   <tr className="bg-slate-900/90 border-b border-slate-700 text-slate-300 font-bold uppercase tracking-wider">
                     <th className="p-4 sm:p-5">Fitur &amp; Indikator Kualitas</th>
                     <th className="p-4 sm:p-5 bg-amber-400/10 text-amber-300 text-center font-black">
-                      ⭐ Sobat Koding
+                      ⭐ Sobat Coding
                     </th>
                     <th className="p-4 sm:p-5 text-center text-slate-400">
                       Tutorial Video / Buku Pasif
@@ -1470,7 +1470,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         <div className="flex items-center justify-center gap-2">
           <BrandLogo size="sm" />
         </div>
-        <p>© {new Date().getFullYear()} Sobat Koding • Dibina oleh Pak GuruAI • Platform Edukasi Koding &amp; Computational Thinking Berbasis Scratch 3.0</p>
+        <p>© {new Date().getFullYear()} Sobat Coding • Dibina oleh Pak GuruAI • Platform Edukasi Koding &amp; Computational Thinking Berbasis Scratch 3.0</p>
         <p className="text-[11px] text-slate-500">Mencetak Generasi Cipta Digital Unggul Indonesia</p>
       </footer>
 

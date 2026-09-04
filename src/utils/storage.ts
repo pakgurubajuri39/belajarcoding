@@ -1,11 +1,16 @@
 import { StudentProgress, UserSession, UserRole, XpHistoryItem } from '../types';
 import { BADGES_DATA, SYLLABUS_DATA } from '../data/syllabus';
 
-const PROGRESS_KEY = 'sobat_koding_progress_v1';
+const PROGRESS_KEY = 'sobat_coding_progress_v1';
+const FALLBACK_PROGRESS_KEY = 'sobat_koding_progress_v1';
 const LEGACY_PROGRESS_KEY = 'djuragan_coding_progress_v1';
-const SESSION_KEY = 'sobat_koding_session_v1';
+
+const SESSION_KEY = 'sobat_coding_session_v1';
+const FALLBACK_SESSION_KEY = 'sobat_koding_session_v1';
 const LEGACY_SESSION_KEY = 'djuragan_coding_session_v1';
-const THEME_KEY = 'sobat_koding_theme_v1';
+
+const THEME_KEY = 'sobat_coding_theme_v1';
+const FALLBACK_THEME_KEY = 'sobat_koding_theme_v1';
 const LEGACY_THEME_KEY = 'djuragan_coding_theme_v1';
 
 export const ADMIN_PASSCODE = 'guruai39';
@@ -40,7 +45,7 @@ export const DEFAULT_SESSION: UserSession = {
 
 export function loadProgress(): StudentProgress {
   try {
-    const raw = localStorage.getItem(PROGRESS_KEY) || localStorage.getItem(LEGACY_PROGRESS_KEY);
+    const raw = localStorage.getItem(PROGRESS_KEY) || localStorage.getItem(FALLBACK_PROGRESS_KEY) || localStorage.getItem(LEGACY_PROGRESS_KEY);
     if (!raw) return DEFAULT_PROGRESS;
     const parsed = JSON.parse(raw);
     return {
@@ -62,7 +67,7 @@ export function saveProgress(progress: StudentProgress): void {
 
 export function loadSession(): UserSession {
   try {
-    const raw = localStorage.getItem(SESSION_KEY) || localStorage.getItem(LEGACY_SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY) || localStorage.getItem(FALLBACK_SESSION_KEY) || localStorage.getItem(LEGACY_SESSION_KEY);
     if (!raw) return DEFAULT_SESSION;
     return JSON.parse(raw);
   } catch {
@@ -81,12 +86,14 @@ export function saveSession(session: UserSession): void {
 export function clearAllLocalData(): void {
   localStorage.removeItem(PROGRESS_KEY);
   localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(FALLBACK_PROGRESS_KEY);
+  localStorage.removeItem(FALLBACK_SESSION_KEY);
   localStorage.removeItem(LEGACY_PROGRESS_KEY);
   localStorage.removeItem(LEGACY_SESSION_KEY);
 }
 
 export function loadSavedTheme(): 'dark' | 'light' {
-  const saved = localStorage.getItem(THEME_KEY) || localStorage.getItem(LEGACY_THEME_KEY);
+  const saved = localStorage.getItem(THEME_KEY) || localStorage.getItem(FALLBACK_THEME_KEY) || localStorage.getItem(LEGACY_THEME_KEY);
   if (saved === 'light' || saved === 'dark') return saved;
   // default to dark mode for sleek coding vibe
   return 'dark';
@@ -175,7 +182,7 @@ export function getRankFromXp(xp: number): { rank: string; title: string; level:
   } else if (xp < 5000) {
     return { rank: 'Pionir', title: 'AI & Code Pioneer', level: 7, nextLevelXp: 5000, progressPercent: Math.min(100, ((xp - 3600) / 1400) * 100), icon: '🚀' };
   } else {
-    return { rank: 'Mahaguru', title: 'Sobat Koding Grandmaster', level: 8, nextLevelXp: 5000, progressPercent: 100, icon: '👑' };
+    return { rank: 'Mahaguru', title: 'Sobat Coding Grandmaster', level: 8, nextLevelXp: 5000, progressPercent: 100, icon: '👑' };
   }
 }
 

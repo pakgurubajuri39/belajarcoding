@@ -20,7 +20,7 @@ export const Footer: React.FC = () => {
           <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
             <span>@copyright by Pak GuruAI</span>
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-            <span className="text-amber-500">Sobat Koding</span>
+            <span className="text-amber-500">Sobat Coding</span>
           </div>
           <div className="text-[11px] text-slate-400">
             Silabus Ekstrakurikuler 20 Level • Disimpan di Perangkat Masing-Masing

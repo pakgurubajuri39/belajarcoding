@@ -30,7 +30,7 @@ const RAW_SYLLABUS_DATA: SyllabusLevel[] = [
         spriteName: 'Sprite1 (Kucing)',
         codeBlocks: [
           { text: 'ketika bendera hijau diklik', category: 'Events', indent: 0 },
-          { text: 'katakan [Halo Sobat Koding!] selama (3) detik', category: 'Looks', indent: 0 },
+          { text: 'katakan [Halo Sobat Coding!] selama (3) detik', category: 'Looks', indent: 0 },
           { text: 'mainkan suara [Meow] sampai selesai', category: 'Sound', indent: 0 }
         ],
         explanation: 'Saat bendera hijau ditekan, sprite kucing akan memunculkan balon percakapan selama 3 detik, kemudian memainkan suara Meow.'
@@ -67,7 +67,7 @@ const RAW_SYLLABUS_DATA: SyllabusLevel[] = [
       {
         stepNumber: 2,
         title: 'Menyusun Program Salam Pertama',
-        instruction: 'Tarik blok kuning "when green flag clicked" ke lembar kerja, lalu pasang blok ungu "say [Halo Sobat Koding!] for [3] secs" tepat di bawahnya.',
+        instruction: 'Tarik blok kuning "when green flag clicked" ke lembar kerja, lalu pasang blok ungu "say [Halo Sobat Coding!] for [3] secs" tepat di bawahnya.',
         hint: 'Klik bendera hijau di atas panggung untuk menguji hasilnya!',
         blockGuide: 'Looks > say [...] for [3] secs'
       },
@@ -1787,7 +1787,7 @@ const RAW_SYLLABUS_DATA: SyllabusLevel[] = [
     iconName: 'Trophy',
     category: 'Game Dev',
     summary: 'Membangun game legendaris Pong Arcade: Raket Pemain 1 (W/S), Raket Pemain 2 (Up/Down), Fisika Pantulan Bola Sudut Cerdas, dan Papan Skor Juara.',
-    conceptExplanation: 'Game Pong adalah mahakarya penutup silabus 20 Level Sobat Koding! Proyek ini mengintegrasikan seluruh kompetensi: Variabel Skor ganda (P1 & P2), Sensing batas gawang, Kalkulasi sudut pantul vektor matematika (point in direction 180 - direction), Mode Multiplayer, serta State Kemenangan Juara.',
+    conceptExplanation: 'Game Pong adalah mahakarya penutup silabus 20 Level Sobat Coding! Proyek ini mengintegrasikan seluruh kompetensi: Variabel Skor ganda (P1 & P2), Sensing batas gawang, Kalkulasi sudut pantul vektor matematika (point in direction 180 - direction), Mode Multiplayer, serta State Kemenangan Juara.',
     learningGoals: [
       'Membuat kontrol independen untuk Raket Pemain 1 (W/S) dan Raket Pemain 2 (Panah Atas/Bawah)',
       'Menerapkan rumus fisika sudut pantul vektor bola: "point in direction ((180) - (direction))"',
@@ -1870,10 +1870,10 @@ const RAW_SYLLABUS_DATA: SyllabusLevel[] = [
         explanation: 'Perintah "go to x: 0 y: 0" mengembalikan posisi bola ke pusat lapangan untuk memulai babak reli baru.'
       },
       {
-        question: 'Selamat! Kamu telah menyelesaikan seluruh 20 Level Silabus Sobat Koding! Apa langkah terbaik selanjutnya?',
+        question: 'Selamat! Kamu telah menyelesaikan seluruh 20 Level Silabus Sobat Coding! Apa langkah terbaik selanjutnya?',
         options: ['Berhenti coding selamanya', 'Terus berkarya membuat game & aplikasi AI sendiri serta berbagi ke teman-teman', 'Menghapus semua karya', 'Hanya bermain game tanpa membuat'],
         correctAnswerIndex: 1,
-        explanation: 'Seorang Sobat Koder sejati terus bereksperimen, menciptakan game seru, dan mempelajari kecerdasan buatan!'
+        explanation: 'Seorang Sobat Coder sejati terus bereksperimen, menciptakan game seru, dan mempelajari kecerdasan buatan!'
       }
     ],
     challenge: {
@@ -1892,14 +1892,14 @@ export const SYLLABUS_DATA: SyllabusLevel[] = RAW_SYLLABUS_DATA.map((lvl) => ({
 }));
 
 export const BADGES_DATA: Badge[] = [
-  { id: 'first_step', name: 'First Step Coder', icon: 'Sparkles', description: 'Menyelesaikan level pertama di Sobat Koding', category: 'Starter' },
+  { id: 'first_step', name: 'First Step Coder', icon: 'Sparkles', description: 'Menyelesaikan level pertama di Sobat Coding', category: 'Starter' },
   { id: 'loop_master', name: 'Loop & Motion Wizard', icon: 'Repeat', description: 'Menguasai perulangan dan gerakan berulang', category: 'Logic' },
   { id: 'game_creator', name: 'Game Dev Prodigy', icon: 'Gamepad2', description: 'Berhasil membuat game interaktif pertamamu', category: 'Projects' },
   { id: 'creative_artist', name: 'Pixel & Pen Artist', icon: 'Palette', description: 'Menciptakan karya seni grafis dan mandala dengan kode', category: 'Creativity' },
   { id: 'logic_champion', name: 'Logic & Math Champion', icon: 'Calculator', description: 'Menguasai operator matematika dan variabel data', category: 'Mastery' },
   { id: 'semester_1_complete', name: 'Ganjil Graduate', icon: 'Award', description: 'Menyelesaikan 10 Level Semester Ganjil', category: 'Milestone' },
   { id: 'semester_2_complete', name: 'Genap Master', icon: 'Trophy', description: 'Menyelesaikan 10 Level Semester Genap', category: 'Milestone' },
-  { id: 'grandmaster', name: 'Sobat Koding Grandmaster', icon: 'Crown', description: 'Menyelesaikan semua 20 level silabus & meraih 3000+ XP!', category: 'Honor' }
+  { id: 'grandmaster', name: 'Sobat Coding Grandmaster', icon: 'Crown', description: 'Menyelesaikan semua 20 level silabus & meraih 3000+ XP!', category: 'Honor' }
 ];
 
 export const AVATAR_OPTIONS: AvatarOption[] = [

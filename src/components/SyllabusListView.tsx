@@ -74,7 +74,7 @@ export const SyllabusListView: React.FC<SyllabusListViewProps> = ({
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
               Kurikulum Mandiri <br />
               <span className="text-amber-400 font-black">Sobat </span>
-              <span className="text-indigo-400 font-black">Koding</span>
+              <span className="text-indigo-400 font-black">Coding</span>
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">

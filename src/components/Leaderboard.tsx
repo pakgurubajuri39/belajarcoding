@@ -39,7 +39,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       syncStudentProgressToFirebase(studentId, {
         fullName: session.studentName,
         email: session.email,
-        schoolOrClass: session.schoolOrClass || (session.role === 'admin' ? 'Instruktur / Guru' : 'Siswa Sobat Koding'),
+        schoolOrClass: session.schoolOrClass || (session.role === 'admin' ? 'Instruktur / Guru' : 'Siswa Sobat Coding'),
         avatar: session.avatar || 'bot_neon',
         xp: currentProgress.xp,
         unlockedLevelIds: currentProgress.unlockedLevelIds,
@@ -71,7 +71,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       await syncStudentProgressToFirebase(studentId, {
         fullName: session.studentName,
         email: session.email,
-        schoolOrClass: session.schoolOrClass || (session.role === 'admin' ? 'Instruktur / Guru' : 'Siswa Sobat Koding'),
+        schoolOrClass: session.schoolOrClass || (session.role === 'admin' ? 'Instruktur / Guru' : 'Siswa Sobat Coding'),
         avatar: session.avatar || 'bot_neon',
         xp: currentProgress.xp,
         unlockedLevelIds: currentProgress.unlockedLevelIds,
@@ -108,7 +108,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       list.push({
         studentId: currentStudentId,
         fullName: session.studentName + (session.role === 'guest' ? ' (Tamu)' : ''),
-        schoolOrClass: session.schoolOrClass || (session.role === 'admin' ? 'Instruktur' : 'Siswa Sobat Koding'),
+        schoolOrClass: session.schoolOrClass || (session.role === 'admin' ? 'Instruktur' : 'Siswa Sobat Coding'),
         avatar: session.avatar || 'bot_neon',
         xp: currentProgress.xp,
         completedLevelIds: currentProgress.completedLevelIds,

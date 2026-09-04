@@ -79,12 +79,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       progress,
       session,
       exportedAt: new Date().toISOString(),
-      appName: 'Sobat Koding'
+      appName: 'Sobat Coding'
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `sobat_koding_backup_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute("download", `sobat_coding_backup_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -123,7 +123,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black">Panel Admin & Instruktur Sobat Koding</h1>
+                <h1 className="text-xl sm:text-2xl font-black">Panel Admin & Instruktur Sobat Coding</h1>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-400 text-slate-950">
                   Akses Penuh
                 </span>

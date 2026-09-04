@@ -477,7 +477,7 @@ export default function App() {
                   </div>
                 </div>
                 <ScratchEmbed
-                  currentLevelTitle="Sobat Koding Scratch Live Workspace"
+                  currentLevelTitle="Sobat Coding Scratch Live Workspace"
                   tutorialUrl="https://turbowarp.org/editor?fps=60"
                   onLogout={handleLogout}
                   studentName={session.studentName}

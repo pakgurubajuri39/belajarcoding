@@ -497,7 +497,7 @@ export const XpProgressionChart: React.FC<XpProgressionChartProps> = ({
                   Dapatkan <strong className="text-amber-500">+{stats.xpNeededForNextRank} XP</strong> lagi untuk naik pangkat menjadi <strong>"{rankInfo.title}"</strong>.
                 </>
               ) : (
-                'Selamat! Kamu telah mencapai pangkat kehormatan tertinggi Sobat Koding Grandmaster!'
+                'Selamat! Kamu telah mencapai pangkat kehormatan tertinggi Sobat Coding Grandmaster!'
               )}
             </p>
           </div>

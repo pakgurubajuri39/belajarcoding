@@ -77,7 +77,7 @@ export const SCRATCH_PALETTE_BLOCKS: Omit<ScratchBlockData, 'id'>[] = [
 
   // LOOKS (Tampilan)
   { category: 'looks', type: 'stack', opcode: 'looks_sayforsecs', template: 'katakan [message] selama [secs] detik', params: { message: 'Halo Dunia Coding!', secs: 2 } },
-  { category: 'looks', type: 'stack', opcode: 'looks_say', template: 'katakan [message]', params: { message: 'Sobat Koding Keren! 🚀' } },
+  { category: 'looks', type: 'stack', opcode: 'looks_say', template: 'katakan [message]', params: { message: 'Sobat Coding Keren! 🚀' } },
   { category: 'looks', type: 'stack', opcode: 'looks_think', template: 'pikirkan [message] selama [secs] detik', params: { message: 'Hmm... Logika asik!', secs: 2 } },
   { category: 'looks', type: 'stack', opcode: 'looks_nextcostume', template: 'ganti kostum berikutnya', params: {} },
   { category: 'looks', type: 'stack', opcode: 'looks_changesizeby', template: 'ubah ukuran sebesar [change]', params: { change: 10 } },

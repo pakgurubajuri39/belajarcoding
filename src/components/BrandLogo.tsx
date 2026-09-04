@@ -84,7 +84,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
               SOBAT
             </span>
             <span className="text-indigo-600 dark:text-indigo-400 font-black tracking-tight">
-              KODING
+              CODING
             </span>
           </div>
 

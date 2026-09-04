@@ -95,12 +95,12 @@ export const AboutLandingView: React.FC<AboutLandingViewProps> = ({
   // FAQs
   const faqs = [
     {
-      question: 'Apa itu Sobat Koding?',
-      answer: 'Sobat Koding adalah platform pembelajaran coding visual berbasis Scratch 3.0 dan Computational Thinking yang dirancang khusus untuk anak-anak dan pemula. Dilengkapi dengan 20 modul kurikulum terstruktur, studio Scratch terintegrasi, sistem gamifikasi XP, laporan progres PDF resmi, dan sertifikat kelulusan digital.'
+      question: 'Apa itu Sobat Coding?',
+      answer: 'Sobat Coding adalah platform pembelajaran coding visual berbasis Scratch 3.0 dan Computational Thinking yang dirancang khusus untuk anak-anak dan pemula. Dilengkapi dengan 20 modul kurikulum terstruktur, studio Scratch terintegrasi, sistem gamifikasi XP, laporan progres PDF resmi, dan sertifikat kelulusan digital.'
     },
     {
       question: 'Apakah anak perlu memiliki pengalaman coding sebelumnya?',
-      answer: 'Sama sekali tidak perlu! Kurikulum Sobat Koding dimulai dari nol murni (Level 1: Mengenal Antarmuka Scratch) dengan penjelasan visual blok warna-warni seperti menyusun puzzle logika yang sangat mudah dipahami anak usia 7 tahun ke atas.'
+      answer: 'Sama sekali tidak perlu! Kurikulum Sobat Coding dimulai dari nol murni (Level 1: Mengenal Antarmuka Scratch) dengan penjelasan visual blok warna-warni seperti menyusun puzzle logika yang sangat mudah dipahami anak usia 7 tahun ke atas.'
     },
     {
       question: 'Apa manfaat belajar Computational Thinking sejak dini?',
@@ -108,7 +108,7 @@ export const AboutLandingView: React.FC<AboutLandingViewProps> = ({
     },
     {
       question: 'Bagaimana cara mendapatkan Kode Akses Siswa penuh?',
-      answer: 'Kode akses resmi diberikan oleh guru pembina ekstrakurikuler, sekolah mitra, atau tim instruktur Sobat Koding. Pengguna baru juga dapat langsung mencoba Mode Trial Gratis (Level 1) tanpa kode akses kapan saja.'
+      answer: 'Kode akses resmi diberikan oleh guru pembina ekstrakurikuler, sekolah mitra, atau tim instruktur Sobat Coding. Pengguna baru juga dapat langsung mencoba Mode Trial Gratis (Level 1) tanpa kode akses kapan saja.'
     },
     {
       question: 'Apakah data kemajuan belajar dan XP tersimpan dengan aman?',
@@ -143,7 +143,7 @@ export const AboutLandingView: React.FC<AboutLandingViewProps> = ({
 
           {/* Subtitle / Marketing Value Proposition */}
           <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Selamat datang di <strong>Sobat Koding</strong>. Panduan belajar koding visual Scratch 3.0 paling lengkap, terstruktur, dan bertahap. Melatih nalar logika, matematika, perancangan game, dan dasar kecerdasan buatan sejak usia dini.
+            Selamat datang di <strong>Sobat Coding</strong>. Panduan belajar koding visual Scratch 3.0 paling lengkap, terstruktur, dan bertahap. Melatih nalar logika, matematika, perancangan game, dan dasar kecerdasan buatan sejak usia dini.
           </p>
 
           {/* Key Feature Badges Grid */}
@@ -217,12 +217,12 @@ export const AboutLandingView: React.FC<AboutLandingViewProps> = ({
         </div>
       </section>
 
-      {/* 2. WHY SOBAT KODING: EDUCATIONAL VALUE & COMPARISON */}
+      {/* 2. WHY SOBAT CODING: EDUCATIONAL VALUE & COMPARISON */}
       <section className="space-y-6">
         <div className="text-center max-w-3xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider">
             <Lightbulb className="w-3.5 h-3.5" />
-            <span>Mengapa Memilih Sobat Koding?</span>
+            <span>Mengapa Memilih Sobat Coding?</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
             Fondasi Emas Menghadapi Masa Depan Berbasis Teknologi
@@ -305,7 +305,7 @@ export const AboutLandingView: React.FC<AboutLandingViewProps> = ({
         <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 text-white shadow-xl">
           <div className="text-center max-w-xl mx-auto mb-6">
             <h3 className="text-lg sm:text-xl font-bold">Transformasi Waktu Layar Gadget Anak</h3>
-            <p className="text-xs text-slate-400 mt-1">Bandingkan aktivitas pasif dengan pengalaman belajar produktif di Sobat Koding</p>
+            <p className="text-xs text-slate-400 mt-1">Bandingkan aktivitas pasif dengan pengalaman belajar produktif di Sobat Coding</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -330,11 +330,11 @@ export const AboutLandingView: React.FC<AboutLandingViewProps> = ({
               </ul>
             </div>
 
-            {/* Box 2: Sobat Koding */}
+            {/* Box 2: Sobat Coding */}
             <div className="p-5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 space-y-3">
               <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Belajar Kreatif di Sobat Koding</span>
+                <span>Belajar Kreatif di Sobat Coding</span>
               </div>
               <ul className="space-y-2 text-xs text-slate-300">
                 <li className="flex items-start gap-2">
@@ -690,7 +690,7 @@ export const AboutLandingView: React.FC<AboutLandingViewProps> = ({
             <span>Pertanyaan yang Sering Diajukan</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-            Tanya Jawab Seputar Sobat Koding
+            Tanya Jawab Seputar Sobat Coding
           </h2>
         </div>
 
@@ -735,7 +735,7 @@ export const AboutLandingView: React.FC<AboutLandingViewProps> = ({
             Siap Mencetak Prestasi dan Menjadi Juara Coding?
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Bergabunglah bersama ribuan siswa lainnya yang telah merasakan serunya belajar logika komputasional dan membuat game impian mereka di Sobat Koding!
+            Bergabunglah bersama ribuan siswa lainnya yang telah merasakan serunya belajar logika komputasional dan membuat game impian mereka di Sobat Coding!
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">

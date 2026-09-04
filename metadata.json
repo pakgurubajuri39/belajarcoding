@@ -1,5 +1,5 @@
 {
-  "name": "Sobat Koding",
+  "name": "Sobat Coding",
   "description": "Aplikasi belajar coding dan kecerdasan buatan mandiri untuk siswa dengan silabus Scratch interaktif, editor terintegrasi, analitik progres, dan sistem XP.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

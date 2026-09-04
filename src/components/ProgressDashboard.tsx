@@ -216,7 +216,7 @@ export const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
                   </div>
 
                   <p className="text-xs sm:text-sm text-slate-300 mt-1">
-                    Peringkat Level {rankInfo.level} • {session.role === 'admin' ? 'Akses Instruktur Penuh' : session.role === 'student' ? 'Siswa Aktif Sobat Koding' : 'Pengguna Uji Coba (Trial)'}
+                    Peringkat Level {rankInfo.level} • {session.role === 'admin' ? 'Akses Instruktur Penuh' : session.role === 'student' ? 'Siswa Aktif Sobat Coding' : 'Pengguna Uji Coba (Trial)'}
                   </p>
 
                   {/* Quick Badge & Change Avatar Button */}
