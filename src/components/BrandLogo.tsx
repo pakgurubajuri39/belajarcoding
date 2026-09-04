@@ -81,10 +81,10 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         <div className="flex flex-col">
           <div className={`leading-none flex items-center gap-1.5 ${titleSizeClasses}`}>
             <span className="text-amber-500 dark:text-amber-400 font-black tracking-tight">
-              DJURAGAN
+              SOBAT
             </span>
             <span className="text-indigo-600 dark:text-indigo-400 font-black tracking-tight">
-              CODING
+              KODING
             </span>
           </div>
 

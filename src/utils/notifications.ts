@@ -10,13 +10,15 @@ export interface InAppNotification {
   badge?: string;
 }
 
-const LAST_VISIT_KEY = 'djuragan_last_visit_timestamp';
-const NOTIFICATIONS_KEY = 'djuragan_inapp_notifications_v1';
-const FIVE_MIN_SESSION_KEY = 'djuragan_5min_session_v1';
+const LAST_VISIT_KEY = 'sobat_koding_last_visit_timestamp';
+const LEGACY_LAST_VISIT_KEY = 'djuragan_last_visit_timestamp';
+const NOTIFICATIONS_KEY = 'sobat_koding_inapp_notifications_v1';
+const LEGACY_NOTIFICATIONS_KEY = 'djuragan_inapp_notifications_v1';
+const FIVE_MIN_SESSION_KEY = 'sobat_koding_5min_session_v1';
 
 export function getLastVisitTime(): number | null {
   try {
-    const raw = localStorage.getItem(LAST_VISIT_KEY);
+    const raw = localStorage.getItem(LAST_VISIT_KEY) || localStorage.getItem(LEGACY_LAST_VISIT_KEY);
     return raw ? parseInt(raw, 10) : null;
   } catch {
     return null;
@@ -63,14 +65,14 @@ export function simulateInactivity(daysAgo = 2.5): void {
 
 export function getStoredNotifications(): InAppNotification[] {
   try {
-    const raw = localStorage.getItem(NOTIFICATIONS_KEY);
+    const raw = localStorage.getItem(NOTIFICATIONS_KEY) || localStorage.getItem(LEGACY_NOTIFICATIONS_KEY);
     if (!raw) {
       // Default welcoming notification
       return [
         {
           id: 'welcome_notif',
           type: 'tip',
-          title: 'Selamat Datang di DJuragan Coding! 🚀',
+          title: 'Selamat Datang di Sobat Koding! 🚀',
           message: 'Selesaikan 20 Level Scratch & AI untuk meraih Sertifikat Kelulusan dan XP tertinggi.',
           timestamp: new Date().toISOString(),
           isRead: false,

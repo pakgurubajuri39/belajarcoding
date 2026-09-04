@@ -30,7 +30,7 @@ export const ScratchEmbed: React.FC<ScratchEmbedProps> = ({
   studentName
 }) => {
   // Navigation & Project Meta
-  const [projectTitle, setProjectTitle] = useState('Proyek Scratch Saya - DJuragan');
+  const [projectTitle, setProjectTitle] = useState('Proyek Scratch Saya - Sobat Koding');
   const [isTurboMode, setIsTurboMode] = useState(false);
   const [activeTab, setActiveTab] = useState<'code' | 'costumes' | 'sounds'>('code');
   const [activeCategory, setActiveCategory] = useState<ScratchCategory>('motion');

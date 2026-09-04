@@ -30,7 +30,7 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
   onOpenTutorials,
   onShareProject,
   onLogout,
-  studentName = 'DJuragan Siswa',
+  studentName = 'Sobat Siswa',
   isCompact = false
 }) => {
   const [activeMenu, setActiveMenu] = useState<'file' | 'edit' | 'lang' | 'profile' | null>(null);
@@ -67,7 +67,7 @@ export const ScratchHeader: React.FC<ScratchHeaderProps> = ({
           <div className="bg-[#FFAB19] text-white font-black text-[11px] sm:text-xs px-1.5 py-0.5 rounded shadow-sm flex items-center justify-center font-sans tracking-tight">
             scratch
           </div>
-          {!isCompact && <span className="hidden xl:inline text-[11px] font-bold text-white/90">DJuragan</span>}
+          {!isCompact && <span className="hidden xl:inline text-[11px] font-bold text-white/90">Sobat Koding</span>}
         </a>
 
         {/* Globe Language Selector */}

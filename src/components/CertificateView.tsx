@@ -31,7 +31,7 @@ export const CertificateView: React.FC<CertificateViewProps> = ({
         <div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">Sertifikat Kelulusan & Prestasi</h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Bukti resmi pencapaian belajar pemrograman Scratch & Kecerdasan Buatan di DJuragan Coding.
+            Bukti resmi pencapaian belajar pemrograman Scratch & Kecerdasan Buatan di Sobat Koding.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export const CertificateView: React.FC<CertificateViewProps> = ({
           {/* Body Text */}
           <p className="max-w-2xl text-xs sm:text-sm text-slate-300 leading-relaxed">
             Atas dedikasi dan keberhasilannya dalam menempuh dan mempraktikkan silabus pembelajaran 
-            <strong> Ekstrakurikuler Coding Scratch & Kecerdasan Buatan</strong> pada platform <strong>DJuragan Coding</strong>, 
+            <strong> Ekstrakurikuler Coding Scratch & Kecerdasan Buatan</strong> pada platform <strong>Sobat Koding</strong>, 
             dengan menyelesaikan modul algoritma, logika perulangan, sensing, game development, dan fisika komputasi.
           </p>
 
@@ -118,7 +118,7 @@ export const CertificateView: React.FC<CertificateViewProps> = ({
               <span className="font-serif italic text-base text-amber-300">Pak GuruAI</span>
               <div className="w-36 h-0.5 bg-slate-600" />
               <span className="text-[11px] font-bold text-slate-300">Instruktur Utama Coding & AI</span>
-              <span className="text-[9px] text-slate-500">DJuragan Coding Academy</span>
+              <span className="text-[9px] text-slate-500">Sobat Koding Academy</span>
             </div>
 
             {/* Center: Official Seal Badge */}
@@ -148,7 +148,7 @@ export const CertificateView: React.FC<CertificateViewProps> = ({
         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-3">
           <Star className="w-5 h-5 flex-shrink-0 text-amber-500" />
           <span>
-            Sertifikat ini terus diperbarui secara otomatis. Selesaikan seluruh 20 Level silabus untuk meraih gelar tertinggi <strong>DJuragan Coding Grandmaster 👑</strong>!
+            Sertifikat ini terus diperbarui secara otomatis. Selesaikan seluruh 20 Level silabus untuk meraih gelar tertinggi <strong>Sobat Koding Grandmaster 👑</strong>!
           </span>
         </div>
       )}
